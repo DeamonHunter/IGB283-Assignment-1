@@ -8,9 +8,11 @@ public class Controller : MonoBehaviour {
 
     // Use this for initialization
     private void Start() {
+        //Get the mesh
         mesh = GetComponent<MeshFilter>().mesh;
         mesh.Clear();
 
+        //Add in some shapes to test rendering
         shapes = new List<Shape>();
         shapes.Add(new Triangle(Vector3.left, Vector3.right, Vector3.up));
         shapes.Add(new Triangle(new Vector3(-1, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 2, 0)));
@@ -18,7 +20,6 @@ public class Controller : MonoBehaviour {
         shapes.Add(new Triangle(new Vector3(-1, 3, 0), new Vector3(1, 3, 0), new Vector3(0, 4, 0)));
         shapes.Add(new Square(new Vector3(-1, -4, 0), new Vector3(1, -4, 0), new Vector3(1, -2, 0), new Vector3(-1, -2, 0)));
 
-        UpdateMesh();
     }
 
     // Update is called once per frame
@@ -26,6 +27,9 @@ public class Controller : MonoBehaviour {
         UpdateMesh();
     }
 
+    /// <summary>
+    /// Updates the mesh to reflect new positions of shapes and even new shapes
+    /// </summary>
     private void UpdateMesh() {
         int offset = 0;
         List<int> triangles = new List<int>();
@@ -34,7 +38,7 @@ public class Controller : MonoBehaviour {
             var trianglePoints = triangle.GetTriangles(offset);
             triangles.AddRange(trianglePoints);
             offset += trianglePoints.Length;
-            points.AddRange(triangle.Points);
+            points.AddRange(triangle.Vertices);
         }
         mesh.vertices = points.ToArray();
         mesh.triangles = triangles.ToArray();
