@@ -30,6 +30,11 @@ public class Controller : MonoBehaviour {
         IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[4], 160 * Time.deltaTime);
+        if (Mathf.Floor(Time.time) % 2 == 0)
+            IGB283Transform.Scale(shapes[4], 1 + 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
+        else
+            IGB283Transform.Scale(shapes[4], 1 - 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
+
         UpdateMesh();
     }
 
