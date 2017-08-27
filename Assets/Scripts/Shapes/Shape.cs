@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -16,6 +17,8 @@ public abstract class Shape {
     /// </summary>
     public Vector3 Center;
 
+    public float InteractionRadius;
+
     /// <summary>
     /// Calculate the center and store it to <see cref="Center"/>.
     /// </summary>
@@ -25,6 +28,12 @@ public abstract class Shape {
             Center += point;
         }
         Center /= Vertices.Length;
+    }
+
+    public void Setup() {
+        CalculateCenter();
+        InteractionRadius = Vertices.Max(vert => (vert - Center).sqrMagnitude);
+        Debug.Log(InteractionRadius);
     }
 
     /// <summary>

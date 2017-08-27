@@ -25,11 +25,36 @@ public class Controller : MonoBehaviour {
 
     // Update is called once per frame
     private void Update() {
+        if (Input.GetMouseButtonDown(0)) {
+            //Stupidly complicated interact code
+            Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
+            Debug.Log(pos);
+            Shape interactedShape = shapes[0];
+            var smallestMag = (shapes[0].Center - pos).sqrMagnitude;
+            for (int i = 1; i < shapes.Count; i++) {
+                if ((shapes[i].Center - pos).sqrMagnitude < smallestMag) {
+                    interactedShape = shapes[i];
+                    smallestMag = (shapes[i].Center - pos).sqrMagnitude;
+                }
+            }
+
+            if (smallestMag < interactedShape.InteractionRadius) {
+                //Do Something
+                Debug.Log("Interacted at: " + interactedShape.Center);
+            }
+        }
+
         IGB283Transform.Rotate(shapes[0], 10 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[1], 20 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[4], 160 * Time.deltaTime);
+        if (Mathf.Floor(Time.time) % 2 == 0)
+            IGB283Transform.Scale(shapes[4], 1 + 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
+        else
+            IGB283Transform.Scale(shapes[4], 1 - 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
+
+
         UpdateMesh();
     }
 

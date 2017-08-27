@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Square : Shape {
 
     public Square(Vector3 x1, Vector3 x2, Vector3 x3, Vector3 x4) {
         Vertices = new[] { x1, x2, x3, x4 };
-        CalculateCenter();
+        Setup();
     }
-    public Square(Vector3[] x) : base() {
+    public Square(Vector3[] x) {
         Debug.Assert(x.Length == 4, "A square should only have four points.");
         Vertices = x;
+        Setup();
     }
 
     public override int[] GetTriangles(int offset) {

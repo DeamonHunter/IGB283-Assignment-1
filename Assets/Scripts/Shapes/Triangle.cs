@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿
+using System.Linq;
 using UnityEngine;
 
 public class Triangle : Shape {
 
     public Triangle(Vector3 x1, Vector3 x2, Vector3 x3) {
         Vertices = new[] { x1, x2, x3 };
-        CalculateCenter();
+        Setup();
     }
-    public Triangle(Vector3[] x) : base() {
+    public Triangle(Vector3[] x) {
         Debug.Assert(x.Length == 3, "A triangle should only have three points.");
         Vertices = x;
+        Setup();
     }
 
     public override int[] GetTriangles(int offset) {

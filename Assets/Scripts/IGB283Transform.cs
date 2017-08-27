@@ -41,8 +41,29 @@ namespace IGB283 {
 
             shape.CalculateCenter();
         }
+        public static void Scale(Shape shape, float mult) {
+            Scale(shape, Vector3.one * mult, shape.Center);
+        }
+
+        public static void Scale(Shape shape, Vector3 mult) {
+            Scale(shape, mult, shape.Center);
+        }
 
         public static void Scale(Shape shape, float mult, Vector3 origin) {
+            Scale(shape, Vector3.one * mult, origin);
+        }
+        public static void Scale(Shape shape, Vector3 mult, Vector3 origin) {
+            for (int i = 0; i < shape.Vertices.Length; i++) {
+                shape.Vertices[i] -= origin;
+                shape.Vertices[i] = ElementWiseVectorMult(shape.Vertices[i], mult);
+                shape.Vertices[i] += origin;
+            }
+
+            shape.CalculateCenter();
+        }
+
+        public static Vector3 ElementWiseVectorMult(Vector3 left, Vector3 right) {
+            return new Vector3(left.x * right.x, left.y * right.y, left.z * right.z);
         }
     }
 
