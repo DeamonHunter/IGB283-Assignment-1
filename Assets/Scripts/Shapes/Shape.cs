@@ -31,6 +31,6 @@ public abstract class Shape {
     /// Get all triangles in order to render shape correctly.
     /// </summary>
     /// <param name="offset">The current rendering offset. As triangles are 3 numbers in a row.</param>
-    /// <returns>An array of points that will render the shape correctly</returns>
+    /// <returns>An array of points that will render the shape correctly.</returns>
     public abstract int[] GetTriangles(int offset);
 }
