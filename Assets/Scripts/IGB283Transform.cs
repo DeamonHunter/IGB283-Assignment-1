@@ -7,7 +7,9 @@ namespace IGB283 {
     public static class IGB283Transform {
 
         public static void Translate(Shape shape, Vector3 vec) {
-
+            for (int i = 0; i < shape.Vertices.Length; i++) {
+                shape.Vertices[i] += vec;
+            }
         }
 
         /// <summary>
