@@ -18,6 +18,8 @@ public abstract class Shape {
     public Vector3 Center;
 
     public float InteractionRadius;
+    public bool MoveTowardsFirst;
+
 
     /// <summary>
     /// Calculate the center and store it to <see cref="Center"/>.

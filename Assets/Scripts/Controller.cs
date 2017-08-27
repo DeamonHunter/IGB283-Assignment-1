@@ -16,6 +16,7 @@ public class Controller : MonoBehaviour {
         //Add in some shapes to test rendering
         shapes = new List<Shape>();
         shapes.Add(new Triangle(Vector3.left, Vector3.right, Vector3.up));
+        shapes[0].Speed = 1;
         shapes.Add(new Triangle(new Vector3(-1, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 2, 0)));
         shapes.Add(new Triangle(new Vector3(-1, 2, 0), new Vector3(1, 2, 0), new Vector3(0, 3, 0)));
         shapes.Add(new Triangle(new Vector3(-1, 3, 0), new Vector3(1, 3, 0), new Vector3(0, 4, 0)));
@@ -44,7 +45,7 @@ public class Controller : MonoBehaviour {
             }
         }
 
-        RotateAndTranslate(shapes[0], 30, 3, 10, false);
+        RotateAndTranslate(shapes[0], 30, -1, 1);
         IGB283Transform.Rotate(shapes[1], 20 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
@@ -75,24 +76,22 @@ public class Controller : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
     }
 
-    private void RotateAndTranslate(Shape shape, float angle, float point1, float point2, bool moveTowardsFirst) {
-        if (!moveTowardsFirst) {
+    private void RotateAndTranslate(Shape shape, float angle, float point1, float point2) {
+        if (!shape.moveTowardsFirst) {
             if (shape.Center.x >= point2) {
-                moveTowardsFirst = true;
+                shape.moveTowardsFirst = true;
             }
             IGB283Transform.Translate(shape, Vector3.right * shape.Speed * Time.deltaTime); //move towards point 2
             IGB283Transform.Rotate(shape, angle * Time.deltaTime);
 
-        } else if (moveTowardsFirst) {
-            if (shape.Center.x >= point1) {
-                moveTowardsFirst = false;
+        }
+        else {
+            if (shape.Center.x <= point1) {
+                shape.moveTowardsFirst = false;
             }
             IGB283Transform.Translate(shape, Vector3.left * shape.Speed * Time.deltaTime); //move towards point 1
-            IGB283Transform.Rotate(shape, angle * Time.deltaTime);
         }
-
-
-
+        IGB283Transform.Rotate(shape, angle * Time.deltaTime);
 
     }
 }
