@@ -77,15 +77,15 @@ public class Controller : MonoBehaviour {
     }
 
     private void RotateAndTranslate(Shape shape, float angle, float point1, float point2) {
-        if (!shape.moveTowardsFirst) {
+        if (!shape.MoveTowardsFirst) {
             if (shape.Center.x >= point2) {
-                shape.moveTowardsFirst = true;
+                shape.MoveTowardsFirst = true;
             }
             IGB283Transform.Translate(shape, Vector3.right * shape.Speed * Time.deltaTime); //move towards point 2
         }
         else {
             if (shape.Center.x <= point1) {
-                shape.moveTowardsFirst = false;
+                shape.MoveTowardsFirst = false;
             }
             IGB283Transform.Translate(shape, Vector3.left * shape.Speed * Time.deltaTime); //move towards point 1
         }
