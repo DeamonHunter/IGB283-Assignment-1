@@ -6,7 +6,6 @@ using UnityEngine;
 public class Controller : MonoBehaviour {
     private Mesh mesh;
     private List<Shape> shapes;
-    private bool moveTowardsFirst;
 
     // Use this for initialization
     private void Start() {
@@ -45,7 +44,7 @@ public class Controller : MonoBehaviour {
             }
         }
 
-        IGB283Transform.Rotate(shapes[0], 10 * Time.deltaTime);
+        RotateAndTranslate(shapes[0], 30, 3, 10, false);
         IGB283Transform.Rotate(shapes[1], 20 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
         IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
@@ -76,24 +75,20 @@ public class Controller : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
     }
 
-    private void RotateAndTranslate(Shape shape, float angle, Vector3 point1, Vector3 point2) {
-        IGB283Transform.Translate(shape, point1); //Start at point 1
-        moveTowardsFirst = false;
-        if (moveTowardsFirst == false) {
-            if (shape.Center == point2) {
+    private void RotateAndTranslate(Shape shape, float angle, float point1, float point2, bool moveTowardsFirst) {
+        if (!moveTowardsFirst) {
+            if (shape.Center.x >= point2) {
                 moveTowardsFirst = true;
             }
-            IGB283Transform.Translate(shape, point2 * shape.Speed * Time.deltaTime); //move towards point 2
+            IGB283Transform.Translate(shape, Vector3.right * shape.Speed * Time.deltaTime); //move towards point 2
             IGB283Transform.Rotate(shape, angle * Time.deltaTime);
-            shape.CalculateCenter();
 
         } else if (moveTowardsFirst) {
-            if (shape.Center == point1) {
+            if (shape.Center.x >= point1) {
                 moveTowardsFirst = false;
             }
-            IGB283Transform.Translate(shape, point1 * shape.Speed * Time.deltaTime); //move towards point 1
+            IGB283Transform.Translate(shape, Vector3.left * shape.Speed * Time.deltaTime); //move towards point 1
             IGB283Transform.Rotate(shape, angle * Time.deltaTime);
-            shape.CalculateCenter();
         }
 
 

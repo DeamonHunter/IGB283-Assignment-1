@@ -10,6 +10,8 @@ namespace IGB283 {
             for (int i = 0; i < shape.Vertices.Length; i++) {
                 shape.Vertices[i] += vec;
             }
+
+            shape.CalculateCenter();
         }
 
         /// <summary>

@@ -47,4 +47,9 @@ public abstract class Shape {
     /// The speed the shape moves. Used for translating between two points.
     /// </summary>
     public float Speed;
+
+    ///<summary>
+    ///What point to move towards first.
+    /// </summary>
+    public bool moveTowardsFirst;
 }
