@@ -43,7 +43,6 @@ namespace IGB283 {
         }
 
         public static void Scale(Shape shape, float mult, Vector3 origin) {
-
         }
     }
 

@@ -33,4 +33,9 @@ public abstract class Shape {
     /// <param name="offset">The current rendering offset. As triangles are 3 numbers in a row.</param>
     /// <returns>An array of points that will render the shape correctly.</returns>
     public abstract int[] GetTriangles(int offset);
+
+    /// <summary>
+    /// The speed the shape moves. Used for translating between two points.
+    /// </summary>
+    public float Speed;
 }
