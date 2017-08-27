@@ -82,8 +82,6 @@ public class Controller : MonoBehaviour {
                 shape.moveTowardsFirst = true;
             }
             IGB283Transform.Translate(shape, Vector3.right * shape.Speed * Time.deltaTime); //move towards point 2
-            IGB283Transform.Rotate(shape, angle * Time.deltaTime);
-
         }
         else {
             if (shape.Center.x <= point1) {
