@@ -14,12 +14,12 @@ public abstract class Shape {
     /// <summary>
     /// The center point of the shape. For rotation reasons.
     /// </summary>
-    protected Vector3 Center;
+    public Vector3 Center;
 
     /// <summary>
     /// Calculate the center and store it to <see cref="Center"/>.
     /// </summary>
-    protected void CalculateCenter() {
+    public void CalculateCenter() {
         Center = Vector3.zero;
         foreach (var point in Vertices) {
             Center += point;

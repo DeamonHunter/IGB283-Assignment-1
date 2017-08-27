@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using IGB283;
 using UnityEngine;
 
 public class Controller : MonoBehaviour {
@@ -24,6 +25,11 @@ public class Controller : MonoBehaviour {
 
     // Update is called once per frame
     private void Update() {
+        IGB283Transform.Rotate(shapes[0], 10 * Time.deltaTime);
+        IGB283Transform.Rotate(shapes[1], 20 * Time.deltaTime);
+        IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
+        IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
+        IGB283Transform.Rotate(shapes[4], 160 * Time.deltaTime);
         UpdateMesh();
     }
 
