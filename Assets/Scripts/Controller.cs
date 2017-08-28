@@ -16,7 +16,7 @@ public class Controller : MonoBehaviour {
         //Add in some shapes to test rendering
         shapes = new List<Shape>();
         shapes.Add(new Triangle(Vector3.left, Vector3.right, Vector3.up));
-        shapes[0].Speed = 1;
+        shapes[0].Speed = 5;
         shapes.Add(new Triangle(new Vector3(-1, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 2, 0)));
         shapes.Add(new Triangle(new Vector3(-1, 2, 0), new Vector3(1, 2, 0), new Vector3(0, 3, 0)));
         shapes.Add(new Triangle(new Vector3(-1, 3, 0), new Vector3(1, 3, 0), new Vector3(0, 4, 0)));
@@ -46,14 +46,14 @@ public class Controller : MonoBehaviour {
         }
 
         RotateAndTranslate(shapes[0], 30, -1, 1);
-        IGB283Transform.Rotate(shapes[1], 20 * Time.deltaTime);
-        IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
-        IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
-        IGB283Transform.Rotate(shapes[4], 160 * Time.deltaTime);
-        if (Mathf.Floor(Time.time) % 2 == 0)
-            IGB283Transform.Scale(shapes[4], 1 + 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
-        else
-            IGB283Transform.Scale(shapes[4], 1 - 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
+        //IGB283Transform.Rotate(shapes[1], 20 * Time.deltaTime);
+        //IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
+        //IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
+        //IGB283Transform.Rotate(shapes[4], 160 * Time.deltaTime);
+        //if (Mathf.Floor(Time.time) % 2 == 0)
+        //    IGB283Transform.Scale(shapes[4], 1 + 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
+        //else
+        //    IGB283Transform.Scale(shapes[4], 1 - 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
 
 
         UpdateMesh();
@@ -77,19 +77,23 @@ public class Controller : MonoBehaviour {
     }
 
     private void RotateAndTranslate(Shape shape, float angle, float point1, float point2) {
+        Vector3 moveDir;
         if (!shape.MoveTowardsFirst) {
             if (shape.Center.x >= point2) {
                 shape.MoveTowardsFirst = true;
             }
-            IGB283Transform.Translate(shape, Vector3.right * shape.Speed * Time.deltaTime); //move towards point 2
+            moveDir = Vector3.right;
         }
         else {
             if (shape.Center.x <= point1) {
                 shape.MoveTowardsFirst = false;
             }
-            IGB283Transform.Translate(shape, Vector3.left * shape.Speed * Time.deltaTime); //move towards point 1
+            moveDir = Vector3.left;
         }
-        IGB283Transform.Rotate(shape, angle * Time.deltaTime);
-
+        var T = IGB283Transform.Translate(-shape.Center);
+        var R = IGB283Transform.Rotate(angle * Time.deltaTime);
+        var TReverse = IGB283Transform.Translate(shape.Center + Time.deltaTime * shape.Speed * moveDir);
+        shape.ApplyTransformation(TReverse * R * T);
+        //shape.ApplyTransformation(R * T);
     }
 }

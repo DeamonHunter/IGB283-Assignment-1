@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using IGB283;
 using UnityEngine;
 
 /// <summary>
@@ -22,23 +23,6 @@ public abstract class Shape {
 
 
     /// <summary>
-    /// Calculate the center and store it to <see cref="Center"/>.
-    /// </summary>
-    public void CalculateCenter() {
-        Center = Vector3.zero;
-        foreach (var point in Vertices) {
-            Center += point;
-        }
-        Center /= Vertices.Length;
-    }
-
-    public void Setup() {
-        CalculateCenter();
-        InteractionRadius = Vertices.Max(vert => (vert - Center).sqrMagnitude);
-        Debug.Log(InteractionRadius);
-    }
-
-    /// <summary>
     /// Get all triangles in order to render shape correctly.
     /// </summary>
     /// <param name="offset">The current rendering offset. As triangles are 3 numbers in a row.</param>
@@ -49,4 +33,33 @@ public abstract class Shape {
     /// The speed the shape moves. Used for translating between two points.
     /// </summary>
     public float Speed;
+
+    public void Setup() {
+        CalculateCenter();
+        InteractionRadius = Vertices.Max(vert => (vert - Center).sqrMagnitude);
+        Debug.Log(InteractionRadius);
+    }
+
+    /// <summary>
+    /// Calculate the center and store it to <see cref="Center"/>.
+    /// </summary>
+    public void CalculateCenter() {
+        Center = Vector3.zero;
+        foreach (var point in Vertices) {
+            Center += point;
+        }
+        Center /= Vertices.Length;
+    }
+
+    public void ApplyTransformation(Matrix3x3 m) {
+
+        for (int i = 0; i < Vertices.Length; i++) {
+            var vert = Vertices[i];
+            vert.z = 1; //Set Z correctly in order to translate.
+            Vertices[i] = m * vert;
+            Vertices[i].z = 0; //Reset Z
+        }
+
+        CalculateCenter();
+    }
 }

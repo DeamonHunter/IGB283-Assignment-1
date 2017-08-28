@@ -188,10 +188,10 @@ namespace IGB283 {
                     b.m[2].x * c.m[0].z + b.m[2].y * c.m[1].z + b.m[2].z * c.m[2].z));
         }
 
-        public static Vector3 operator *(Vector3 left, Matrix3x3 right) {
-            return new Vector3(left.x * right.m[0].x + left.y * right.m[1].x + left.z * right.m[2].x,
-                left.x * right.m[0].y + left.y * right.m[1].y + left.z * right.m[2].y,
-                left.x * right.m[0].z + left.y * right.m[1].z + left.z * right.m[2].z);
+        public static Vector3 operator *(Matrix3x3 left, Vector3 right) {
+            return new Vector3(left.m[0].x * right.x + left.m[0].y * right.y + left.m[0].z * right.z,
+                left.m[1].x * right.x + left.m[1].y * right.y + left.m[1].z * right.z,
+                left.m[2].x * right.x + left.m[2].y * right.y + left.m[2].z * right.z);
         }
 
         // Multiply a matrix by a scalar 
