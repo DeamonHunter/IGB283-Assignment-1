@@ -16,6 +16,8 @@ public class Controller : MonoBehaviour {
 
     public bool ThreeDimensional;
 
+    private List<Color> c;
+
     // Use this for initialization
     private void Start() {
         //Get the mesh
@@ -30,7 +32,7 @@ public class Controller : MonoBehaviour {
         shapes.Add(new Triangle(new Vector3(-1, 2, 0), new Vector3(1, 2, 0), new Vector3(0, 3, 0)));
         shapes.Add(new Triangle(new Vector3(-1, 3, 0), new Vector3(1, 3, 0), new Vector3(0, 4, 0)));
         shapes.Add(new Square(new Vector3(-1, -4, 0), new Vector3(1, -4, 0), new Vector3(1, -2, 0), new Vector3(-1, -2, 0)));
-
+        shapes.Add(new Cube(0.5f));
     }
 
     // Update is called once per frame
@@ -103,11 +105,11 @@ public class Controller : MonoBehaviour {
         int offset = 0;
         List<int> triangles = new List<int>();
         List<Vector3> points = new List<Vector3>();
-        foreach (var triangle in shapes) {
-            var trianglePoints = triangle.GetTriangles(offset);
-            triangles.AddRange(trianglePoints);
-            offset += trianglePoints.Length;
-            points.AddRange(triangle.Vertices);
+        foreach (var shape in shapes) {
+            var shapeTriangles = shape.GetTriangles(offset);
+            triangles.AddRange(shapeTriangles);
+            offset += shape.Vertices.Length;
+            points.AddRange(shape.Vertices);
         }
         mesh.vertices = points.ToArray();
         mesh.triangles = triangles.ToArray();
