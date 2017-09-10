@@ -239,7 +239,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f9187a872654a04a82449e07210afa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ThreeDimensional: 0
+  DragCooldown: 0.1
+  ThreeDimensional: 1
 --- !u!23 &1077318494
 MeshRenderer:
   m_ObjectHideFlags: 0
