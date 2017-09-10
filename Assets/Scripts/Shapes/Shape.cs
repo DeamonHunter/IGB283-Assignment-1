@@ -38,7 +38,7 @@ public abstract class Shape {
     public void Setup() {
         CalculateCenter();
         InteractionRadius = Vertices.Max(vert => (vert - Center).sqrMagnitude);
-        Debug.Log(InteractionRadius);
+        //Debug.Log(InteractionRadius);
     }
 
     /// <summary>
