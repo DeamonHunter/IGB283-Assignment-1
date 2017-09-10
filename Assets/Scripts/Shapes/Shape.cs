@@ -55,9 +55,20 @@ public abstract class Shape {
 
         for (int i = 0; i < Vertices.Length; i++) {
             var vert = Vertices[i];
+            float z = vert.z;
             vert.z = 1; //Set Z correctly in order to translate.
             Vertices[i] = m * vert;
-            Vertices[i].z = 0; //Reset Z
+            Vertices[i].z = z; //Reset Z
+        }
+
+        CalculateCenter();
+    }
+
+    public void ApplyTransformation(IGB283.Matrix4x4 m) {
+
+        for (int i = 0; i < Vertices.Length; i++) {
+            var vert = Vertices[i];
+            Vertices[i] = m.MultiplyVector3(vert);
         }
 
         CalculateCenter();
