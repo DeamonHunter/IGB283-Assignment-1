@@ -6,9 +6,13 @@ using UnityEngine;
 public class Controller : MonoBehaviour {
     private Mesh mesh;
     private List<Shape> shapes;
-    Shape closestShape;
     float maxSpeed = 10;
     float minSpeed = 0;
+
+
+    private Shape draggedShape;
+    public float DragCooldown = 0.1f;
+    private float curDragCooldown;
 
     public bool ThreeDimensional;
 
@@ -41,7 +45,25 @@ public class Controller : MonoBehaviour {
                 if (interactedShape.Speed < maxSpeed)
                     interactedShape.Speed += 1;
                 Debug.Log("Interacted at: " + interactedShape.Center);
+                draggedShape = interactedShape;
             }
+        }
+
+        if (Input.GetMouseButton(0) && draggedShape != null) {
+            if (curDragCooldown > 0) {
+                curDragCooldown -= Time.deltaTime;
+            }
+            else {
+                float distance = Camera.main.ScreenToWorldPoint(Input.mousePosition).y - draggedShape.Center.y;
+                Debug.Log(distance);
+                Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, distance));
+                draggedShape.ApplyTransformation(T);
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0)) {
+            draggedShape = null;
+            curDragCooldown = DragCooldown;
         }
 
         //Right Click
@@ -58,21 +80,12 @@ public class Controller : MonoBehaviour {
         }
 
         RotateAndTranslate(shapes[0], 30, -1, 1);
-        //IGB283Transform.Rotate(shapes[1], 20 * Time.deltaTime);
-        //IGB283Transform.Rotate(shapes[2], 40 * Time.deltaTime);
-        //IGB283Transform.Rotate(shapes[3], 80 * Time.deltaTime);
-        //IGB283Transform.Rotate(shapes[4], 160 * Time.deltaTime);
-        //if (Mathf.Floor(Time.time) % 2 == 0)
-        //    IGB283Transform.Scale(shapes[4], 1 + 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
-        //else
-        //    IGB283Transform.Scale(shapes[4], 1 - 0.5f * Time.deltaTime, new Vector3(0.2f, 0.1f, 0f));
-
 
         UpdateMesh();
     }
 
     private bool TryGetClosestShape(Vector3 pos, out Shape interactedShape) {
-        var smallestMag = (shapes[0].Center - pos).sqrMagnitude;
+        float smallestMag = (shapes[0].Center - pos).sqrMagnitude;
         interactedShape = shapes[0];
         for (int i = 1; i < shapes.Count; i++) {
             if ((shapes[i].Center - pos).sqrMagnitude < smallestMag) {
