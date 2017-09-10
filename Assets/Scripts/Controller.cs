@@ -16,6 +16,8 @@ public class Controller : MonoBehaviour {
 
     public bool ThreeDimensional;
 
+    private List<Color> c;
+
     // Use this for initialization
     private void Start() {
         //Get the mesh
@@ -25,16 +27,12 @@ public class Controller : MonoBehaviour {
         //Add in some shapes to test rendering
         shapes = new List<Shape>();
         shapes.Add(new Triangle(Vector3.left, Vector3.right, Vector3.up));
+        shapes[0].Speed = 5;
         shapes.Add(new Triangle(new Vector3(-1, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 2, 0)));
         shapes.Add(new Triangle(new Vector3(-1, 2, 0), new Vector3(1, 2, 0), new Vector3(0, 3, 0)));
         shapes.Add(new Triangle(new Vector3(-1, 3, 0), new Vector3(1, 3, 0), new Vector3(0, 4, 0)));
         shapes.Add(new Square(new Vector3(-1, -4, 0), new Vector3(1, -4, 0), new Vector3(1, -2, 0), new Vector3(-1, -2, 0)));
-        shapes[0].Speed = 5;
-        shapes[1].Speed = 0;
-        shapes[2].Speed = 7;
-        shapes[3].Speed = 10;
-        shapes[4].Speed = 2;
-
+        shapes.Add(new Cube(0.5f));
     }
 
     // Update is called once per frame
@@ -84,10 +82,6 @@ public class Controller : MonoBehaviour {
         }
 
         RotateAndTranslate(shapes[0], 30, -1, 1);
-        RotateAndTranslate(shapes[1], 30, -1, 1);
-        RotateAndTranslate(shapes[2], 30, -1, 1);
-        RotateAndTranslate(shapes[3], 30, -1, 1);
-        RotateAndTranslate(shapes[4], 30, -1, 1);
 
         UpdateMesh();
     }
@@ -111,29 +105,20 @@ public class Controller : MonoBehaviour {
         int offset = 0;
         List<int> triangles = new List<int>();
         List<Vector3> points = new List<Vector3>();
-        foreach (var triangle in shapes) {
-            var trianglePoints = triangle.GetTriangles(offset);
-            triangles.AddRange(trianglePoints);
-            offset += trianglePoints.Length;
-            points.AddRange(triangle.Vertices);
+        foreach (var shape in shapes) {
+            var shapeTriangles = shape.GetTriangles(offset);
+            triangles.AddRange(shapeTriangles);
+            offset += shape.Vertices.Length;
+            points.AddRange(shape.Vertices);
         }
         mesh.vertices = points.ToArray();
         mesh.triangles = triangles.ToArray();
-        Color[] colors = new Color[mesh.vertices.Length];
-        for (int i = 0; i < mesh.vertices.Length; i++) {
-            colors[i] = Color.Lerp(Color.red, Color.green, mesh.vertices[i].x);
-        }
-        mesh.colors = colors;
-        
-
-
     }
 
     private void RotateAndTranslate(Shape shape, float angle, float point1, float point2) {
         Vector3 moveDir;
         if (!shape.MoveTowardsFirst) {
             if (shape.Center.x >= point2) {
-                
                 shape.MoveTowardsFirst = true;
             }
             moveDir = Vector3.right;
