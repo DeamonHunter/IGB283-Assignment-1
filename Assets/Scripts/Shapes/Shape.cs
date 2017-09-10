@@ -22,6 +22,7 @@ public abstract class Shape {
     public bool MoveTowardsFirst;
 
 
+
     /// <summary>
     /// Get all triangles in order to render shape correctly.
     /// </summary>

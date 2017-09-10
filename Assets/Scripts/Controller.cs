@@ -106,6 +106,14 @@ public class Controller : MonoBehaviour {
         }
         mesh.vertices = points.ToArray();
         mesh.triangles = triangles.ToArray();
+        Color[] colors = new Color[mesh.vertices.Length];
+        for (int i = 0; i < mesh.vertices.Length; i++) {
+            colors[i] = Color.Lerp(Color.red, Color.green, mesh.vertices[i].x);
+        }
+        mesh.colors = colors;
+        
+
+
     }
 
     private void RotateAndTranslate(Shape shape, float angle, float point1, float point2) {
