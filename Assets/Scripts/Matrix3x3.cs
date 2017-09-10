@@ -6,61 +6,6 @@ namespace IGB283 {
     public class Matrix3x3 {
         private const int matrixOrder = 3;
 
-        // Static Variables
-        // The identiy matrix
-        public static Matrix3x3 Identity {
-            get { return new Matrix3x3(new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)); }
-        }
-
-        // The zero matrix
-        private readonly Vector3 zeroVector = new Vector3(0.0f, 0.0f, 0.0f);
-
-        public static Matrix3x3 zero {
-            get { return new Matrix3x3(Vector3.zero, Vector3.zero, Vector3.zero); }
-        }
-
-        // Variables
-        // The determinant of the matrix
-        public float Determinant {
-            get {
-                return
-                    m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
-                    - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
-                    + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
-            }
-        }
-
-
-        // The inverse of the matrix
-        //TODO
-        public Matrix3x3 inverse {
-            get {
-                return (1 / Determinant) * (new Matrix3x3(
-                           new Vector3(
-                               (m[1][1] * m[2][2] - m[1][2] * m[2][1]),
-                               -(m[1][0] * m[2][2] - m[1][2] * m[2][0]),
-                               (m[1][0] * m[2][1] - m[1][1] * m[2][0])
-                           ),
-                           new Vector3(
-                               -(m[0][1] * m[2][2] - m[0][2] * m[2][1]),
-                               (m[0][0] * m[2][2] - m[0][2] * m[2][0]),
-                               -(m[0][0] * m[2][1] - m[0][1] * m[2][0])
-                           ),
-                           new Vector3(
-                               (m[0][1] * m[1][2] - m[0][2] * m[1][1]),
-                               -(m[0][0] * m[1][2] - m[0][2] * m[1][0]),
-                               (m[0][0] * m[1][1] - m[0][1] * m[1][0])
-                           )
-                       ).transpose);
-            }
-        }
-
-        // Is the matrix an identity matrix
-        //TODO
-        public bool isIdentity {
-            get { return this.Equals(Identity); }
-        }
-
         // The element at x, y
         public float this[int row, int column] {
             get { return m[row][column]; }
@@ -94,9 +39,9 @@ namespace IGB283 {
 
         // Create a matrix 3x3 initialised with zeros
         public Matrix3x3() {
-            m.Add(zeroVector);
-            m.Add(zeroVector);
-            m.Add(zeroVector);
+            m.Add(Vector3.zero);
+            m.Add(Vector3.zero);
+            m.Add(Vector3.zero);
         }
 
         // Public Functions

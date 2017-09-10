@@ -10,6 +10,8 @@ public class Controller : MonoBehaviour {
     float maxSpeed = 10;
     float minSpeed = 0;
 
+    public bool ThreeDimensional;
+
     // Use this for initialization
     private void Start() {
         //Get the mesh
@@ -121,11 +123,20 @@ public class Controller : MonoBehaviour {
             }
             moveDir = Vector3.left;
         }
-        var T = IGB283Transform.Translate(-shape.Center);
-        var R = IGB283Transform.Rotate(angle * Time.deltaTime);
-        var TReverse = IGB283Transform.Translate(shape.Center + Time.deltaTime * shape.Speed * moveDir);
-        shape.ApplyTransformation(TReverse * R * T);
-        //shape.ApplyTransformation(R * T);
+
+        if (!ThreeDimensional) {
+            var center = new Vector2(shape.Center.x, shape.Center.y);
+            Matrix3x3 T = IGB283Transform.Translate(-center);
+            Matrix3x3 R = IGB283Transform.Rotate(angle * Time.deltaTime);
+            Matrix3x3 TReverse = IGB283Transform.Translate(center + Time.deltaTime * shape.Speed * new Vector2(moveDir.x, moveDir.y));
+            shape.ApplyTransformation(TReverse * R * T);
+        }
+        else {
+            IGB283.Matrix4x4 T = IGB283Transform.Translate(-shape.Center);
+            IGB283.Matrix4x4 R = IGB283Transform.Rotate(angle * Time.deltaTime, IGB283Transform.Axis.X);
+            IGB283.Matrix4x4 TReverse = IGB283Transform.Translate(shape.Center + Time.deltaTime * shape.Speed * moveDir);
+            shape.ApplyTransformation(TReverse * R * T);
+        }
     }
 }
 
