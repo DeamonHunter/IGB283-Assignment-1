@@ -40,9 +40,8 @@ public class Controller : MonoBehaviour {
             //Stupidly complicated interact code
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
             Debug.Log(pos);
-            Shape interactedShape = shapes[0];
-            float smallestMag = GetClosestShape(pos, interactedShape);
-            if (smallestMag < interactedShape.InteractionRadius) {
+            Shape interactedShape;
+            if (TryGetClosestShape(pos, out interactedShape)) {
                 if (interactedShape.Speed < maxSpeed)
                     interactedShape.Speed += 1;
                 Debug.Log("Interacted at: " + interactedShape.Center);
@@ -54,10 +53,9 @@ public class Controller : MonoBehaviour {
             //Stupidly complicated interact code
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
             Debug.Log(pos);
-            Shape interactedShape = shapes[0];
-            float smallestMag = GetClosestShape(pos, interactedShape);
-            if (smallestMag < interactedShape.InteractionRadius) {
-                if (interactedShape.Speed > minSpeed)
+            Shape interactedShape;
+            if (TryGetClosestShape(pos, out interactedShape)) {
+                if (interactedShape.Speed > 0)
                     interactedShape.Speed -= 1;
                 Debug.Log("Interacted at: " + interactedShape.Center);
             }
@@ -81,15 +79,16 @@ public class Controller : MonoBehaviour {
         UpdateMesh();
     }
 
-    private float GetClosestShape(Vector3 pos, Shape interactedShape) {
+    private bool TryGetClosestShape(Vector3 pos, out Shape interactedShape) {
         var smallestMag = (shapes[0].Center - pos).sqrMagnitude;
+        interactedShape = shapes[0];
         for (int i = 1; i < shapes.Count; i++) {
             if ((shapes[i].Center - pos).sqrMagnitude < smallestMag) {
                 interactedShape = shapes[i];
                 smallestMag = (shapes[i].Center - pos).sqrMagnitude;
             }
         }
-        return smallestMag;
+        return smallestMag < interactedShape.InteractionRadius;
     }
 
     /// <summary>
@@ -117,7 +116,8 @@ public class Controller : MonoBehaviour {
                 shape.MoveTowardsFirst = true;
             }
             moveDir = Vector3.right;
-        } else {
+        }
+        else {
             if (shape.Center.x <= point1) {
                 shape.MoveTowardsFirst = false;
             }
@@ -140,5 +140,5 @@ public class Controller : MonoBehaviour {
     }
 }
 
-   
-        
+
+
