@@ -6,6 +6,9 @@ using UnityEngine;
 public class Controller : MonoBehaviour {
     private Mesh mesh;
     private List<Shape> shapes;
+    Shape closestShape;
+    float maxSpeed = 10;
+    float minSpeed = 0;
 
     public bool ThreeDimensional;
 
@@ -28,21 +31,30 @@ public class Controller : MonoBehaviour {
 
     // Update is called once per frame
     private void Update() {
+        //Left Click
         if (Input.GetMouseButtonDown(0)) {
             //Stupidly complicated interact code
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
             Debug.Log(pos);
             Shape interactedShape = shapes[0];
-            var smallestMag = (shapes[0].Center - pos).sqrMagnitude;
-            for (int i = 1; i < shapes.Count; i++) {
-                if ((shapes[i].Center - pos).sqrMagnitude < smallestMag) {
-                    interactedShape = shapes[i];
-                    smallestMag = (shapes[i].Center - pos).sqrMagnitude;
-                }
-            }
-
+            float smallestMag = GetClosestShape(pos, interactedShape);
             if (smallestMag < interactedShape.InteractionRadius) {
-                //Do Something
+                if (interactedShape.Speed < maxSpeed)
+                    interactedShape.Speed += 1;
+                Debug.Log("Interacted at: " + interactedShape.Center);
+            }
+        }
+
+        //Right Click
+        if (Input.GetMouseButtonDown(1)) {
+            //Stupidly complicated interact code
+            Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
+            Debug.Log(pos);
+            Shape interactedShape = shapes[0];
+            float smallestMag = GetClosestShape(pos, interactedShape);
+            if (smallestMag < interactedShape.InteractionRadius) {
+                if (interactedShape.Speed > minSpeed)
+                    interactedShape.Speed -= 1;
                 Debug.Log("Interacted at: " + interactedShape.Center);
             }
         }
@@ -59,6 +71,17 @@ public class Controller : MonoBehaviour {
 
 
         UpdateMesh();
+    }
+
+    private float GetClosestShape(Vector3 pos, Shape interactedShape) {
+        var smallestMag = (shapes[0].Center - pos).sqrMagnitude;
+        for (int i = 1; i < shapes.Count; i++) {
+            if ((shapes[i].Center - pos).sqrMagnitude < smallestMag) {
+                interactedShape = shapes[i];
+                smallestMag = (shapes[i].Center - pos).sqrMagnitude;
+            }
+        }
+        return smallestMag;
     }
 
     /// <summary>
@@ -85,8 +108,7 @@ public class Controller : MonoBehaviour {
                 shape.MoveTowardsFirst = true;
             }
             moveDir = Vector3.right;
-        }
-        else {
+        } else {
             if (shape.Center.x <= point1) {
                 shape.MoveTowardsFirst = false;
             }
@@ -108,3 +130,6 @@ public class Controller : MonoBehaviour {
         }
     }
 }
+
+   
+        
