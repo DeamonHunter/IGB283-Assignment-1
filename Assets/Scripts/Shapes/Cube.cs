@@ -8,12 +8,13 @@ public class Cube : Shape {
         Setup();
     }
 
-    public Cube(float scale) {
+    public Cube(float scale, Vector3 center) {
         Vertices = new Vector3[] {
             new Vector3(0, 0, 0), new Vector3(scale, 0, 0), new Vector3(0, scale, 0),new Vector3(scale, scale, 0),
             new Vector3(0, 0, scale), new Vector3(scale,0,scale), new Vector3(0,scale,scale), new Vector3(scale,scale,scale)
         };
         Setup();
+        ApplyTransformation(IGB283.IGB283Transform.Translate(center - new Vector3(0.5f, 0.5f, 0.5f)));
     }
 
     public override int[] GetTriangles(int offset) {

@@ -20,9 +20,7 @@ public abstract class Shape {
 
     public float InteractionRadius;
     public bool MoveTowardsFirst;
-
-
-
+    
     /// <summary>
     /// Get all triangles in order to render shape correctly.
     /// </summary>
@@ -34,6 +32,7 @@ public abstract class Shape {
     /// The speed the shape moves. Used for translating between two points.
     /// </summary>
     public float Speed;
+    public Vector3 RotationSpeed;
 
     public void Setup() {
         CalculateCenter();
