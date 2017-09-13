@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using IGB283;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Controller : MonoBehaviour {
@@ -62,8 +63,8 @@ public class Controller : MonoBehaviour {
 
     // Update is called once per frame
     private void Update() {
-        //Left Click
-        if (Input.GetMouseButtonDown(0)) {
+        //Left Click but ignore left clicks starting on UI elements.
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0)) {
             //Stupidly complicated interact code
             Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
             Debug.Log(pos);
