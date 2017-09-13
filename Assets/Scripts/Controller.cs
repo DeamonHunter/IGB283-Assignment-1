@@ -141,7 +141,7 @@ public class Controller : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
         Color[] colors = new Color[mesh.vertices.Length];
         for (int i = 0; i < mesh.vertices.Length; i++) {
-            colors[i] = Color.Lerp(Colours[0], Colours[1], (mesh.vertices[i].x + 1) / 2);
+            colors[i] = Color.Lerp(Colours[0], Colours[1], (mesh.vertices[i].x - XBounds.x) / (XBounds.y - XBounds.x));
         }
         mesh.colors = colors;
     }
