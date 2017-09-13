@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Circle : Shape {
     private int[] triangles;
-    
+
     public Circle(Vector3 center, float radius, int numOfTriangles) {
         Debug.Assert(numOfTriangles > 3);
 

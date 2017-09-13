@@ -19,7 +19,7 @@ public abstract class Shape {
     public Vector3 Center;
 
     public float InteractionRadius;
-    public bool MoveTowardsFirst;
+    public bool MoveLeft;
     
     /// <summary>
     /// Get all triangles in order to render shape correctly.

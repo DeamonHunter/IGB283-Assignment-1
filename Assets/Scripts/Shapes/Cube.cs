@@ -14,7 +14,7 @@ public class Cube : Shape {
             new Vector3(0, 0, scale), new Vector3(scale,0,scale), new Vector3(0,scale,scale), new Vector3(scale,scale,scale)
         };
         Setup();
-        ApplyTransformation(IGB283.IGB283Transform.Translate(center - new Vector3(0.5f, 0.5f, 0.5f)));
+        ApplyTransformation(IGB283.IGB283Transform.Translate(center - Center));
     }
 
     public override int[] GetTriangles(int offset) {
