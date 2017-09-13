@@ -52,9 +52,9 @@ namespace IGB283 {
                         new Vector4(0, 0, 0, 1)
                     );
                 case Axis.Y:
-                    return new Matrix4x4(new Vector4(Mathf.Cos(Mathf.Deg2Rad * angle), 0, -Mathf.Sin(Mathf.Deg2Rad * angle), 0),
+                    return new Matrix4x4(new Vector4(Mathf.Cos(Mathf.Deg2Rad * angle), 0, Mathf.Sin(Mathf.Deg2Rad * angle), 0),
                         new Vector4(0, 1, 0, 0),
-                        new Vector4(Mathf.Sin(Mathf.Deg2Rad * angle), 0, Mathf.Cos(Mathf.Deg2Rad * angle), 0),
+                        new Vector4(-Mathf.Sin(Mathf.Deg2Rad * angle), 0, Mathf.Cos(Mathf.Deg2Rad * angle), 0),
                         new Vector4(0, 0, 0, 1)
                     );
                 case Axis.X:
@@ -66,6 +66,13 @@ namespace IGB283 {
                 default:
                     return null;
             }
+        }
+
+        public static Matrix4x4 Rotate(Vector3 angles) {
+            Matrix4x4 rx = Rotate(angles.x, Axis.X);
+            Matrix4x4 ry = Rotate(angles.y, Axis.Y);
+            Matrix4x4 rz = Rotate(angles.z, Axis.Z);
+            return rz * ry * rx;
         }
 
         public static Matrix3x3 Scale(Vector2 mult) {

@@ -1634,10 +1634,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sliders: []
+  DragCooldown: 0.1
   XBounds: {x: 0, y: 0}
   YBounds: {x: 0, y: 0}
   DragCooldown: 0.1
   ThreeDimensional: 0
+  Colours:
+  - {r: 0.8074178, g: 0.84073055, b: 0.9632353, a: 1}
+  - {r: 0.1478941, g: 0.58823526, b: 0.06487888, a: 1}
 --- !u!23 &1077318494
 MeshRenderer:
   m_ObjectHideFlags: 0

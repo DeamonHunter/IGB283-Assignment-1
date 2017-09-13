@@ -4,25 +4,19 @@ using IGB283;
 using UnityEngine;
 
 public class Controller : MonoBehaviour {
-    //Public variables
-    public float DragCooldown = 0.1f;
-    public bool ThreeDimensional;
-    public Color[] Colours; 
-
-    //Components
     private Mesh mesh;
-
-    //Constants
-    private const float maxSpeed = 10;
-    private const float minSpeed = 0;
-
-    //Shapes
     private List<Shape> shapes;
+    float maxSpeed = 10;
+    float minSpeed = 0;
 
-    //Dragging
+
     private Shape draggedShape;
+    public float DragCooldown = 0.1f;
     private float curDragCooldown;
 
+    public bool ThreeDimensional;
+
+    private List<Color> c;
 
     // Use this for initialization
     private void Start() {
@@ -32,23 +26,21 @@ public class Controller : MonoBehaviour {
 
         //Add in some shapes to test rendering
         shapes = new List<Shape>();
-        shapes.Add(new Circle(Vector3.zero, 0.25f, 100));
-        shapes[0].Speed = 3;
-        shapes[0].RotationSpeed = new Vector3(60, 10, 20);
-        shapes.Add(new Cube(0.5f, new Vector3(-1,1,0)));
-        shapes[1].Speed = 5;
-        shapes[1].RotationSpeed = new Vector3(10, 60, 20);
-        shapes.Add(new Cube(0.5f, new Vector3(-1,-1,0)));
-        shapes[2].Speed = 2;
-        shapes[2].RotationSpeed = new Vector3(30, 10, 50);
-        shapes.Add(new Cube(0.5f, new Vector3(1,1,0)));
-        shapes[3].Speed = 4;
-        shapes[3].RotationSpeed = new Vector3(40, 30, 20);
-        shapes[3].MoveTowardsFirst = false;
-        shapes.Add(new Cube(0.5f, new Vector3(1,-1,0)));
-        shapes[4].Speed = 6;
-        shapes[4].RotationSpeed = new Vector3(60, 20, 60);
-        shapes[4].MoveTowardsFirst = false;
+        shapes.Add(new Triangle(Vector3.left, Vector3.right, Vector3.up));
+        shapes[0].Speed = 5;
+        shapes.Add(new Triangle(new Vector3(-1, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 2, 0)));
+        shapes.Add(new Triangle(new Vector3(-1, 2, 0), new Vector3(1, 2, 0), new Vector3(0, 3, 0)));
+        shapes.Add(new Triangle(new Vector3(-1, 3, 0), new Vector3(1, 3, 0), new Vector3(0, 4, 0)));
+        shapes.Add(new Square(new Vector3(-1, -4, 0), new Vector3(1, -4, 0), new Vector3(1, -2, 0), new Vector3(-1, -2, 0)));
+        shapes.Add(new Cube(0.5f));
+<<<<<<< HEAD
+=======
+        shapes[0].Speed = 5;
+        shapes[1].Speed = 0;
+        shapes[2].Speed = 7;
+        shapes[3].Speed = 10;
+        shapes[4].Speed = 2;
+>>>>>>> origin/Deamon
     }
 
     // Update is called once per frame
@@ -97,11 +89,14 @@ public class Controller : MonoBehaviour {
             }
         }
 
-        RotateAndTranslate(shapes[0], -1, 1);
-        RotateAndTranslate(shapes[1], -1, 1);
-        RotateAndTranslate(shapes[2], -1, 1);
-        RotateAndTranslate(shapes[3], -1, 1);
-        RotateAndTranslate(shapes[4], -1, 1);
+        RotateAndTranslate(shapes[0], 30, -1, 1);
+<<<<<<< HEAD
+=======
+        RotateAndTranslate(shapes[1], 30, -1, 1);
+        RotateAndTranslate(shapes[2], 30, -1, 1);
+        RotateAndTranslate(shapes[3], 30, -1, 1);
+        RotateAndTranslate(shapes[4], 30, -1, 1);
+>>>>>>> origin/Deamon
 
         UpdateMesh();
     }
@@ -133,18 +128,12 @@ public class Controller : MonoBehaviour {
         }
         mesh.vertices = points.ToArray();
         mesh.triangles = triangles.ToArray();
-        Color[] colors = new Color[mesh.vertices.Length];
-        for (int i = 0; i < mesh.vertices.Length; i++) {
-            colors[i] = Color.Lerp(Colours[0], Colours[1], (mesh.vertices[i].x + 1) / 2);
-        }
-        mesh.colors = colors;
     }
 
-    private void RotateAndTranslate(Shape shape, float point1, float point2) {
+    private void RotateAndTranslate(Shape shape, float angle, float point1, float point2) {
         Vector3 moveDir;
         if (!shape.MoveTowardsFirst) {
             if (shape.Center.x >= point2) {
-                
                 shape.MoveTowardsFirst = true;
             }
             moveDir = Vector3.right;
@@ -159,13 +148,13 @@ public class Controller : MonoBehaviour {
         if (!ThreeDimensional) {
             var center = new Vector2(shape.Center.x, shape.Center.y);
             Matrix3x3 T = IGB283Transform.Translate(-center);
-            Matrix3x3 R = IGB283Transform.Rotate(shape.RotationSpeed.z * Time.deltaTime);
+            Matrix3x3 R = IGB283Transform.Rotate(angle * Time.deltaTime);
             Matrix3x3 TReverse = IGB283Transform.Translate(center + Time.deltaTime * shape.Speed * new Vector2(moveDir.x, moveDir.y));
             shape.ApplyTransformation(TReverse * R * T);
         }
         else {
             IGB283.Matrix4x4 T = IGB283Transform.Translate(-shape.Center);
-            IGB283.Matrix4x4 R = IGB283Transform.Rotate(shape.RotationSpeed * Time.deltaTime );
+            IGB283.Matrix4x4 R = IGB283Transform.Rotate(angle * Time.deltaTime, IGB283Transform.Axis.X);
             IGB283.Matrix4x4 TReverse = IGB283Transform.Translate(shape.Center + Time.deltaTime * shape.Speed * moveDir);
             shape.ApplyTransformation(TReverse * R * T);
         }
