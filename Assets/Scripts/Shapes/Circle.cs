@@ -1,9 +1,19 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// Class that defines a circle based on a center point
+/// </summary>
 public class Circle : Shape {
     private int[] triangles;
 
+    /// <summary>
+    /// Constructer for Circle.
+    /// </summary>
+    /// <param name="center">The center point of the circle.</param>
+    /// <param name="radius">The distance the edge of the circle is from the center.</param>
+    /// <param name="numOfTriangles">Number of triangles to use as part of this circle</param>
     public Circle(Vector3 center, float radius, int numOfTriangles) {
         Debug.Assert(numOfTriangles > 3);
 

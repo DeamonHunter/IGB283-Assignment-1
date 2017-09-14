@@ -10,16 +10,6 @@ namespace IGB283 {
     public class Matrix4x4 {
         private const int matrixOrder = 4;
 
-        // The element at x, y
-        public float this[int row, int column] {
-            get { return m[row][column]; }
-            set {
-                Vector3 v = m[row];
-                v[column] = value;
-                m[row] = v;
-            }
-        }
-
         // The transpose of the matrix
         public static Matrix4x4 identity {
             get {
@@ -52,16 +42,6 @@ namespace IGB283 {
             m.Add(Vector4.zero);
         }
 
-        // Public Functions
-        // get a column of the matrix
-        public Vector3 GetColumn(int column) {
-            return new Vector3(m[0][column], m[1][column], m[2][column]);
-        }
-
-        // get a row of the matrix
-        public Vector3 GetRow(int row) {
-            return m[row];
-        }
 
         // Transform a point by this matrix
         public Vector3 MultiplyVector3(Vector3 p) {
@@ -141,10 +121,11 @@ namespace IGB283 {
                     b.m[3].x * c.m[0].w + b.m[3].y * c.m[1].w + b.m[3].z * c.m[2].w + b.m[3].w * c.m[3].w));
         }
 
+        // Override multiplication variables to allow vector mult.
         public static Vector3 operator *(Matrix4x4 left, Vector3 right) {
             return left.MultiplyVector3(right);
         }
-        public static Vector3 operator *(Matrix4x4 left, Vector4 right) {
+        public static Vector4 operator *(Matrix4x4 left, Vector4 right) {
             return left.MultiplyVector4(right);
         }
 

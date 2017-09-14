@@ -1,7 +1,8 @@
-﻿
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
+/// <summary>
+/// Class that defines a Triangular shape.
+/// </summary>
 public class Triangle : Shape {
 
     public Triangle(Vector3 x1, Vector3 x2, Vector3 x3) {

@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+
+/// <summary>
+/// Class that defines a cube based on a center point.
+/// </summary>
 public class Cube : Shape {
 
     public Cube(Vector3[] x) {
@@ -8,6 +12,11 @@ public class Cube : Shape {
         Setup();
     }
 
+    /// <summary>
+    /// Constructer for Cube
+    /// </summary>
+    /// <param name="scale">How large each edge of the cube is.</param>
+    /// <param name="center">Position of the center.</param>
     public Cube(float scale, Vector3 center) {
         Vertices = new Vector3[] {
             new Vector3(0, 0, 0), new Vector3(scale, 0, 0), new Vector3(0, scale, 0),new Vector3(scale, scale, 0),
