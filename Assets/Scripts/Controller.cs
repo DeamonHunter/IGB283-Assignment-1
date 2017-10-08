@@ -44,11 +44,12 @@ public class Controller : MonoBehaviour {
 
         Body = new Square(new Vector3(0.5f, 0.5f, 0), new Vector3(-0.5f, 0.5f, 0), new Vector3(-0.5f, -0.5f, 0), new Vector3(0.5f, -0.5f, 0));
         shapes.Add(Body);
-        Arm = new Square(new Vector3(-0.450f, 0.45f, 0), new Vector3(0.45f, 0.45f, 0), new Vector3(0.45f, 2.9f, 0), new Vector3(-0.45f, 2.9f, 0));
+        Arm = new Square(new Vector3(-0.3f, 0.45f, 0), new Vector3(0.3f, 0.45f, 0), new Vector3(0.45f, 2.4f, 0), new Vector3(-0.45f, 2.4f, 0));
         Arm.RotateCenter = new Vector3(0, 0.45f, 0);
         Body.AddChild(Arm);
         shapes.Add(Arm);
-        Head = new Square(new Vector3(-0.1f, 0.8f, 0), new Vector3(0.1f, 0.8f, 0), new Vector3(0.1f, 1.4f, 0), new Vector3(-0.1f, 1.4f, 0));
+        Head = new Square(new Vector3(-0.1f, 2.3f, 0), new Vector3(0.1f, 2.3f, 0), new Vector3(0.1f, 2.8f, 0), new Vector3(-0.1f, 2.8f, 0));
+        Head.RotateCenter = new Vector3(0, 2.3f, 0);
         Arm.AddChild(Head);
         shapes.Add(Head);
     }
@@ -61,6 +62,13 @@ public class Controller : MonoBehaviour {
         IGB283.Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)Arm.RotateCenter);
 
         Arm.ApplyTransformation(TReverse * R * T);
+
+
+        T = IGB283Transform.Translate(-(Vector2)Head.RotateCenter);
+        R = IGB283Transform.Rotate(50f * Time.deltaTime);
+        TReverse = IGB283Transform.Translate((Vector2)Head.RotateCenter);
+
+        Head.ApplyTransformation(TReverse * R * T);
         //Update the mesh to reflect changes
         UpdateMesh();
     }
