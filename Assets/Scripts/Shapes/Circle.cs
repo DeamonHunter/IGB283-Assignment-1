@@ -31,7 +31,6 @@ public class Circle : Shape {
             else
                 triangles[i * 3 + 2] = i + 2;
         }
-        Setup();
     }
 
     public override int[] GetTriangles(int offset) {

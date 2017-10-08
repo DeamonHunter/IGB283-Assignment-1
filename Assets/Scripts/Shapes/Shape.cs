@@ -16,14 +16,20 @@ public abstract class Shape {
     public Vector3[] Vertices;
 
     /// <summary>
-    /// The center point of the shape. For rotation reasons.
+    /// The center point of the shape for rotation reasons.
     /// </summary>
-    public Vector3 Center;
+    public Vector3 RotateCenter;
 
     /// <summary>
     /// The maximum distance this shape can be interacted with.
     /// </summary>
     public float InteractionRadius;
+
+
+    /// <summary>
+    /// List of all shapes that are Children to this shape
+    /// </summary>
+    private List<Shape> children;
     #endregion
 
     #region Movement Properties
@@ -45,29 +51,18 @@ public abstract class Shape {
     #endregion
 
     /// <summary>
-    /// Setup the shape for first use.
-    /// </summary>
-    public void Setup() {
-        CalculateCenter();
-        InteractionRadius = Vertices.Max(vert => (vert - Center).magnitude);
-    }
-
-    /// <summary>
     /// Get all triangles in order to render shape correctly.
     /// </summary>
     /// <param name="offset">The current rendering offset. As triangles are 3 numbers in a row.</param>
     /// <returns>An array of points that will render the shape correctly.</returns>
     public abstract int[] GetTriangles(int offset);
 
-    /// <summary>
-    /// Calculate the center and store it to <see cref="Center"/>.
-    /// </summary>
-    public void CalculateCenter() {
-        Center = Vector3.zero;
-        foreach (Vector3 point in Vertices) {
-            Center += point;
-        }
-        Center /= Vertices.Length;
+    public Shape() {
+        children = new List<Shape>();
+    }
+
+    public void AddChild(Shape shape) {
+        children.Add(shape);
     }
 
     /// <summary>
@@ -82,7 +77,15 @@ public abstract class Shape {
             Vertices[i] = m * vert;
             Vertices[i].z = z; //Reset Z
         }
-        CalculateCenter();
+        foreach (var shape in children) {
+            shape.ApplyTransformation(m);
+        }
+
+        Vector3 vert2 = RotateCenter;
+        float z2 = vert2.z;
+        vert2.z = 1; //Set Z correctly in order to translate.
+        RotateCenter = m * vert2;
+        RotateCenter.z = z2; //Reset Z
     }
 
     /// <summary>
@@ -90,10 +93,10 @@ public abstract class Shape {
     /// </summary>
     /// <param name="m">A 4x4 transformation matrix.</param>
     public void ApplyTransformation(IGB283.Matrix4x4 m) {
+        //TODO Update
         for (int i = 0; i < Vertices.Length; i++) {
             Vector3 vert = Vertices[i];
             Vertices[i] = m.MultiplyVector3(vert);
         }
-        CalculateCenter();
     }
 }

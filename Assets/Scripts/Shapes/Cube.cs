@@ -9,7 +9,6 @@ public class Cube : Shape {
     public Cube(Vector3[] x) {
         Debug.Assert(x.Length == 8, "A square should only have four points.");
         Vertices = x;
-        Setup();
     }
 
     /// <summary>
@@ -22,8 +21,7 @@ public class Cube : Shape {
             new Vector3(0, 0, 0), new Vector3(scale, 0, 0), new Vector3(0, scale, 0),new Vector3(scale, scale, 0),
             new Vector3(0, 0, scale), new Vector3(scale,0,scale), new Vector3(0,scale,scale), new Vector3(scale,scale,scale)
         };
-        Setup();
-        ApplyTransformation(IGB283.IGB283Transform.Translate(center - Center));
+        ApplyTransformation(IGB283.IGB283Transform.Translate(center - RotateCenter));
     }
 
     public override int[] GetTriangles(int offset) {

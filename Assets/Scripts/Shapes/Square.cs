@@ -6,12 +6,10 @@
 public class Square : Shape {
     public Square(Vector3 x1, Vector3 x2, Vector3 x3, Vector3 x4) {
         Vertices = new[] { x1, x2, x3, x4 };
-        Setup();
     }
     public Square(Vector3[] x) {
         Debug.Assert(x.Length == 4, "A square should only have four points.");
         Vertices = x;
-        Setup();
     }
 
     public override int[] GetTriangles(int offset) {
