@@ -38,6 +38,7 @@ public class Controller : MonoBehaviour {
     private const float gravity = -18;
     private float gettingUpCooldown;
     private bool gettingUp;
+    private bool moveUp = false;
 
     /// <summary>
     /// Used to initialise all shapes.
@@ -208,15 +209,14 @@ public class Controller : MonoBehaviour {
     }
 
     private void Nodding() {
-        bool moveUp = false;
         if (!moveUp) {
             RotateShape(Head, Time.deltaTime * 20);
-            if (Mathf.Approximately(60, Head.Angle)) {
+            if (60 < Head.Angle) {
                 moveUp = true;
             }
-        } else if (moveUp) {
+        } else {
             RotateShape(Head, Time.deltaTime * -20);
-            if (Mathf.Approximately(0, Head.Angle)) {
+            if (0 > Head.Angle) {
                 moveUp = true;
             }
 
