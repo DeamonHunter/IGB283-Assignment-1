@@ -210,14 +210,15 @@ public class Controller : MonoBehaviour {
 
     private void Nodding() {
         if (!moveUp) {
-            RotateShape(Head, Time.deltaTime * 20);
-            if (60 < Head.Angle) {
+            RotateShape(Head, Time.deltaTime * 60);
+            if (90 < Head.Angle) {
                 moveUp = true;
+                Debug.Log(moveUp);
             }
         } else {
-            RotateShape(Head, Time.deltaTime * -20);
-            if (0 > Head.Angle) {
-                moveUp = true;
+            RotateShape(Head, Time.deltaTime * -60);
+            if (30 > Head.Angle) {
+                moveUp = false;
             }
 
         }
