@@ -84,6 +84,7 @@ public class Controller : MonoBehaviour {
         TReverse = IGB283Transform.Translate((Vector2)Head.RotateCenter);
 
         Head.ApplyTransformation(TReverse * R * T);
+        TranslateLeftAndRight(Body, -50, 50);
         //Update the mesh to reflect changes
         UpdateMesh();
     }
@@ -109,6 +110,50 @@ public class Controller : MonoBehaviour {
         mesh.triangles = triangles.ToArray();
 
         mesh.colors = new Color[] { Color.white, Color.white, Color.white, Color.white, Color.black, Color.black, Color.black, Color.black, Color.red, Color.red, Color.red, Color.red, Color.blue, Color.blue, Color.blue, Color.blue };
+    }
+
+    private void TranslateLeftAndRight(Shape shape, int point1, int point2) {
+
+        //Determine which direction to move the shape in.
+        Vector3 moveDir;
+        if (!shape.MoveLeft) {
+            if (shape.RotateCenter.x >= point1)
+                shape.MoveLeft = true;
+            moveDir = Vector3.right;
+        } else {
+            if (shape.RotateCenter.x <= point2)
+                shape.MoveLeft = false;
+            moveDir = Vector3.left;
+        }
+
+        Matrix3x3 T = IGB283Transform.Translate(Time.deltaTime * shape.Speed * new Vector2(moveDir.x, moveDir.y));
+        shape.ApplyTransformation(T);
+    }
+
+    private void Nodding(Shape shape, int point1, int point2) {
+        Vector3 moveDir;
+        if (!shape.MoveUp) {
+            if (shape.RotateCenter.x >= point1)
+                shape.MoveUp = true;
+            moveDir = Vector3.down;
+        } else {
+            if (shape.RotateCenter.x <= point2)
+                shape.MoveUp = false;
+            moveDir = Vector3.up;
+        }
+
+        Matrix3x3 T = IGB283Transform.Translate(-(Vector2)LowerArm.RotateCenter);
+        Matrix3x3 R = IGB283Transform.Rotate(-50f * Time.deltaTime);
+        Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)LowerArm.RotateCenter);
+
+        shape.ApplyTransformation(TReverse * R * T);
+
+
+
+
+
+
+
     }
 }
 

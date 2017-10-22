@@ -45,9 +45,14 @@ public abstract class Shape {
     public Vector3 RotationSpeed;
 
     /// <summary>
-    /// Determines which direction the shape will move.
+    /// Determines which direction the shape will move (left and right).
     /// </summary>
     public bool MoveLeft;
+
+    /// <summary>
+    /// Determines which direction the shape will move (up and down).
+    /// </summary>
+    public bool MoveUp;
     #endregion
 
     /// <summary>
