@@ -49,8 +49,8 @@ public abstract class Shape {
     /// </summary>
     public bool MoveLeft;
 
-    /// <summary>
-    /// Determines which direction the shape will move (up and down).
+
+    public float Angle;
     /// </summary>
     public bool MoveUp;
     #endregion

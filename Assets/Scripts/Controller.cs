@@ -33,6 +33,12 @@ public class Controller : MonoBehaviour {
     private Shape LowerArm;
     private Shape Body;
 
+    private bool fallingDown;
+    private float verticalMomentum;
+    private const float gravity = -18;
+    private float gettingUpCooldown;
+    private bool gettingUp;
+
     /// <summary>
     /// Used to initialise all shapes.
     /// </summary>
@@ -65,28 +71,97 @@ public class Controller : MonoBehaviour {
 
 
     // Update is called once per frame
-    private void Update() {
-        IGB283.Matrix3x3 T = IGB283Transform.Translate(-(Vector2)UpperArm.RotateCenter);
-        IGB283.Matrix3x3 R = IGB283Transform.Rotate(50f * Time.deltaTime);
-        IGB283.Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)UpperArm.RotateCenter);
+    private void Update()
+    {
+        if (!gettingUp && !fallingDown)
+        {
+            if (Input.GetKeyDown(KeyCode.G))
+                fallingDown = true;
+        }
+        if (fallingDown)
+            FallDown();
+        if (gettingUp)
+            GettingUp();
 
-        UpperArm.ApplyTransformation(TReverse * R * T);
-
-        T = IGB283Transform.Translate(-(Vector2)LowerArm.RotateCenter);
-        R = IGB283Transform.Rotate(-50f * Time.deltaTime);
-        TReverse = IGB283Transform.Translate((Vector2)LowerArm.RotateCenter);
-
-        LowerArm.ApplyTransformation(TReverse * R * T);
-
-
-        T = IGB283Transform.Translate(-(Vector2)Head.RotateCenter);
-        R = IGB283Transform.Rotate(50f * Time.deltaTime);
-        TReverse = IGB283Transform.Translate((Vector2)Head.RotateCenter);
-
-        Head.ApplyTransformation(TReverse * R * T);
-        TranslateLeftAndRight(Body, -50, 50);
+        ApplyVerticalMomentum();
         //Update the mesh to reflect changes
         UpdateMesh();
+    }
+
+    private void ApplyVerticalMomentum()
+    {
+        var hit = Physics2D.Raycast(new Vector2((Body.Vertices[0].x + Body.Vertices[1].x) / 2, Body.Vertices[0].y),
+            Vector2.down, 0.05f);
+        if (hit)
+        {
+            Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, -hit.distance));
+            Body.ApplyTransformation(T);
+            verticalMomentum = 0;
+        }
+        else {
+            Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, verticalMomentum * Time.deltaTime));
+            Body.ApplyTransformation(T);
+            verticalMomentum += gravity * Time.deltaTime;
+        }
+    }
+
+
+    private void FallDown()
+    {
+        if (UpperArm.Angle > -110)
+        {
+            RotateShape(UpperArm, Time.deltaTime * -200);
+
+            RotateShape(LowerArm, Time.deltaTime * 30);
+        }
+        else
+        {
+            fallingDown = false;
+            gettingUp = true;
+            gettingUpCooldown = 1f;
+        }
+
+    }
+
+
+    private void GettingUp() {
+        if (gettingUpCooldown > 0)
+        {
+            gettingUpCooldown -= Time.deltaTime;
+            return;
+        }
+
+        if (UpperArm.Angle < -60) {
+            RotateShape(UpperArm, Time.deltaTime * 40);
+            RotateShape(LowerArm, Time.deltaTime * 30);
+            RotateShape(Head, Time.deltaTime * 30);
+        }
+        else if (UpperArm.Angle < 0)
+        {
+            RotateShape(UpperArm, Time.deltaTime * 100);
+            if (LowerArm.Angle > 0)
+                RotateShape(LowerArm, Time.deltaTime * -100);
+            if (Head.Angle > 0)
+                RotateShape(Head, Time.deltaTime * -50);
+        }
+        else
+        {
+            gettingUp = false;
+            RotateShape(UpperArm, -UpperArm.Angle);
+            RotateShape(LowerArm, -LowerArm.Angle);
+            RotateShape(Head, -Head.Angle);
+        }
+    }
+
+
+    private void RotateShape(Shape shape, float angle) {
+        Matrix3x3 T = IGB283Transform.Translate(-(Vector2)shape.RotateCenter);
+        Matrix3x3 R = IGB283Transform.Rotate(angle);
+        Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)shape.RotateCenter);
+        shape.ApplyTransformation(TReverse * R * T);
+        shape.Angle += angle;
+
+        TranslateLeftAndRight(Body, -50, 50);
     }
 
     /// <summary>
