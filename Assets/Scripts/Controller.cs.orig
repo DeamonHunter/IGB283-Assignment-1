@@ -2,115 +2,172 @@
 using System.Collections.Generic;
 using IGB283;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
+/// <summary>
+/// Main controller of the assignment.
+/// </summary>
 public class Controller : MonoBehaviour {
-    private Mesh mesh;
-    private List<Shape> shapes;
-    float maxSpeed = 10;
-    float minSpeed = 0;
-
-
-    private Shape draggedShape;
+    #region Public Variables
     public float DragCooldown = 0.1f;
-    private float curDragCooldown;
-
     public bool ThreeDimensional;
+    public Color[] Colours;
+    public Slider[] Sliders;
+    #endregion
 
-    private List<Color> c;
+    #region private Variables
+    //Components
+    private Mesh mesh;
 
-    // Use this for initialization
+    //Constants
+    private const float maxSpeed = 10;
+
+    //Shapes
+    private List<Shape> shapes;
+    #endregion
+
+
+    private Shape Head;
+    private Shape UpperArm;
+    private Shape LowerArm;
+    private Shape Body;
+
+    private bool fallingDown;
+    private float verticalMomentum;
+    private const float gravity = -18;
+    private float gettingUpCooldown;
+    private bool gettingUp;
+
+    /// <summary>
+    /// Used to initialise all shapes.
+    /// </summary>
     private void Start() {
-        //Get the mesh
+        //Get the mesh and clear it
         mesh = GetComponent<MeshFilter>().mesh;
         mesh.Clear();
 
-        //Add in some shapes to test rendering
         shapes = new List<Shape>();
-        shapes.Add(new Triangle(Vector3.left, Vector3.right, Vector3.up));
-        shapes[0].Speed = 5;
-        shapes.Add(new Triangle(new Vector3(-1, 1, 0), new Vector3(1, 1, 0), new Vector3(0, 2, 0)));
-        shapes.Add(new Triangle(new Vector3(-1, 2, 0), new Vector3(1, 2, 0), new Vector3(0, 3, 0)));
-        shapes.Add(new Triangle(new Vector3(-1, 3, 0), new Vector3(1, 3, 0), new Vector3(0, 4, 0)));
-        shapes.Add(new Square(new Vector3(-1, -4, 0), new Vector3(1, -4, 0), new Vector3(1, -2, 0), new Vector3(-1, -2, 0)));
-        shapes.Add(new Cube(0.5f));
-<<<<<<< HEAD
-=======
-        shapes[0].Speed = 5;
-        shapes[1].Speed = 0;
-        shapes[2].Speed = 7;
-        shapes[3].Speed = 10;
-        shapes[4].Speed = 2;
->>>>>>> origin/Deamon
+
+        Body = new Square(new Vector3(-1f, -1f, 0), new Vector3(-1f, 0f, 0), new Vector3(1f, 0f, 0), new Vector3(1, -1, 0));
+        Body.RotateCenter = new Vector3(0, -0.5f, 0);
+        shapes.Add(Body);
+
+        UpperArm = new Square(new Vector3(-0.25f, 0f, 0), new Vector3(-0.25f, 2f, 0), new Vector3(0.25f, 2f, 0), new Vector3(0.25f, 0f, 0));
+        UpperArm.RotateCenter = new Vector3(0, 0f, 0);
+        Body.AddChild(UpperArm);
+        shapes.Add(UpperArm);
+
+        LowerArm = new Square(new Vector3(-0.25f, 2f, 0), new Vector3(-0.25f, 4f, 0), new Vector3(0.25f, 4f, 0), new Vector3(0.25f, 2f, 0));
+        LowerArm.RotateCenter = new Vector3(0, 2f, 0);
+        UpperArm.AddChild(LowerArm);
+        shapes.Add(LowerArm);
+
+        Head = new Square(new Vector3(-0.1f, 4f, 0), new Vector3(-0.1f, 5f, 0), new Vector3(0.1f, 5f, 0), new Vector3(0.1f, 4f, 0));
+        Head.RotateCenter = new Vector3(0, 4f, 0);
+        LowerArm.AddChild(Head);
+        shapes.Add(Head);
     }
 
+
     // Update is called once per frame
-    private void Update() {
-        //Left Click
-        if (Input.GetMouseButtonDown(0)) {
-            //Stupidly complicated interact code
-            Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
-            Debug.Log(pos);
-            Shape interactedShape;
-            if (TryGetClosestShape(pos, out interactedShape)) {
-                if (interactedShape.Speed < maxSpeed)
-                    interactedShape.Speed += 1;
-                Debug.Log("Interacted at: " + interactedShape.Center);
-                draggedShape = interactedShape;
-            }
+    private void Update()
+    {
+        if (!gettingUp && !fallingDown)
+        {
+            if (Input.GetKeyDown(KeyCode.G))
+                fallingDown = true;
         }
+        if (fallingDown)
+            FallDown();
+        if (gettingUp)
+            GettingUp();
 
-        if (Input.GetMouseButton(0) && draggedShape != null) {
-            if (curDragCooldown > 0) {
-                curDragCooldown -= Time.deltaTime;
-            }
-            else {
-                float distance = Camera.main.ScreenToWorldPoint(Input.mousePosition).y - draggedShape.Center.y;
-                Debug.Log(distance);
-                Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, distance));
-                draggedShape.ApplyTransformation(T);
-            }
-        }
-
-        if (Input.GetMouseButtonUp(0)) {
-            draggedShape = null;
-            curDragCooldown = DragCooldown;
-        }
-
-        //Right Click
-        if (Input.GetMouseButtonDown(1)) {
-            //Stupidly complicated interact code
-            Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10);
-            Debug.Log(pos);
-            Shape interactedShape;
-            if (TryGetClosestShape(pos, out interactedShape)) {
-                if (interactedShape.Speed > 0)
-                    interactedShape.Speed -= 1;
-                Debug.Log("Interacted at: " + interactedShape.Center);
-            }
-        }
-
-        RotateAndTranslate(shapes[0], 30, -1, 1);
-<<<<<<< HEAD
-=======
-        RotateAndTranslate(shapes[1], 30, -1, 1);
-        RotateAndTranslate(shapes[2], 30, -1, 1);
-        RotateAndTranslate(shapes[3], 30, -1, 1);
-        RotateAndTranslate(shapes[4], 30, -1, 1);
->>>>>>> origin/Deamon
-
+        ApplyVerticalMomentum();
+        //Update the mesh to reflect changes
         UpdateMesh();
     }
 
-    private bool TryGetClosestShape(Vector3 pos, out Shape interactedShape) {
-        float smallestMag = (shapes[0].Center - pos).sqrMagnitude;
-        interactedShape = shapes[0];
-        for (int i = 1; i < shapes.Count; i++) {
-            if ((shapes[i].Center - pos).sqrMagnitude < smallestMag) {
-                interactedShape = shapes[i];
-                smallestMag = (shapes[i].Center - pos).sqrMagnitude;
-            }
+    private void ApplyVerticalMomentum()
+    {
+        var hit = Physics2D.Raycast(new Vector2((Body.Vertices[0].x + Body.Vertices[1].x) / 2, Body.Vertices[0].y),
+            Vector2.down, 0.05f);
+        if (hit)
+        {
+            Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, -hit.distance));
+            Body.ApplyTransformation(T);
+            verticalMomentum = 0;
         }
-        return smallestMag < interactedShape.InteractionRadius;
+        else {
+            Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, verticalMomentum * Time.deltaTime));
+            Body.ApplyTransformation(T);
+            verticalMomentum += gravity * Time.deltaTime;
+        }
+    }
+
+
+    private void FallDown()
+    {
+        if (UpperArm.Angle > -110)
+        {
+            RotateShape(UpperArm, Time.deltaTime * -200);
+
+            RotateShape(LowerArm, Time.deltaTime * 30);
+        }
+        else
+        {
+            fallingDown = false;
+            gettingUp = true;
+            gettingUpCooldown = 1f;
+        }
+
+    }
+
+
+    private void GettingUp() {
+        if (gettingUpCooldown > 0)
+        {
+            gettingUpCooldown -= Time.deltaTime;
+            return;
+        }
+
+        if (UpperArm.Angle < -60) {
+            RotateShape(UpperArm, Time.deltaTime * 40);
+            RotateShape(LowerArm, Time.deltaTime * 30);
+            RotateShape(Head, Time.deltaTime * 30);
+        }
+        else if (UpperArm.Angle < 0)
+        {
+            RotateShape(UpperArm, Time.deltaTime * 100);
+            if (LowerArm.Angle > 0)
+                RotateShape(LowerArm, Time.deltaTime * -100);
+            if (Head.Angle > 0)
+                RotateShape(Head, Time.deltaTime * -50);
+        }
+        else
+        {
+            gettingUp = false;
+            RotateShape(UpperArm, -UpperArm.Angle);
+            RotateShape(LowerArm, -LowerArm.Angle);
+            RotateShape(Head, -Head.Angle);
+        }
+    }
+
+
+    private void RotateShape(Shape shape, float angle) {
+        Matrix3x3 T = IGB283Transform.Translate(-(Vector2)shape.RotateCenter);
+        Matrix3x3 R = IGB283Transform.Rotate(angle);
+        Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)shape.RotateCenter);
+        shape.ApplyTransformation(TReverse * R * T);
+        shape.Angle += angle;
+
+<<<<<<< HEAD
+        Head.ApplyTransformation(TReverse * R * T);
+        TranslateLeftAndRight(Body, -50, 50);
+        //Update the mesh to reflect changes
+        UpdateMesh();
+=======
+>>>>>>> origin/Deamon
     }
 
     /// <summary>
@@ -120,44 +177,64 @@ public class Controller : MonoBehaviour {
         int offset = 0;
         List<int> triangles = new List<int>();
         List<Vector3> points = new List<Vector3>();
+
+        //Add each shape to the above variables
         foreach (var shape in shapes) {
             var shapeTriangles = shape.GetTriangles(offset);
             triangles.AddRange(shapeTriangles);
             offset += shape.Vertices.Length;
             points.AddRange(shape.Vertices);
         }
+
+        //Set Mesh vertex and triangle positions
         mesh.vertices = points.ToArray();
         mesh.triangles = triangles.ToArray();
+
+        mesh.colors = new Color[] { Color.white, Color.white, Color.white, Color.white, Color.black, Color.black, Color.black, Color.black, Color.red, Color.red, Color.red, Color.red, Color.blue, Color.blue, Color.blue, Color.blue };
     }
 
-    private void RotateAndTranslate(Shape shape, float angle, float point1, float point2) {
+    private void TranslateLeftAndRight(Shape shape, int point1, int point2) {
+
+        //Determine which direction to move the shape in.
         Vector3 moveDir;
-        if (!shape.MoveTowardsFirst) {
-            if (shape.Center.x >= point2) {
-                shape.MoveTowardsFirst = true;
-            }
+        if (!shape.MoveLeft) {
+            if (shape.RotateCenter.x >= point1)
+                shape.MoveLeft = true;
             moveDir = Vector3.right;
-        }
-        else {
-            if (shape.Center.x <= point1) {
-                shape.MoveTowardsFirst = false;
-            }
+        } else {
+            if (shape.RotateCenter.x <= point2)
+                shape.MoveLeft = false;
             moveDir = Vector3.left;
         }
 
-        if (!ThreeDimensional) {
-            var center = new Vector2(shape.Center.x, shape.Center.y);
-            Matrix3x3 T = IGB283Transform.Translate(-center);
-            Matrix3x3 R = IGB283Transform.Rotate(angle * Time.deltaTime);
-            Matrix3x3 TReverse = IGB283Transform.Translate(center + Time.deltaTime * shape.Speed * new Vector2(moveDir.x, moveDir.y));
-            shape.ApplyTransformation(TReverse * R * T);
+        Matrix3x3 T = IGB283Transform.Translate(Time.deltaTime * shape.Speed * new Vector2(moveDir.x, moveDir.y));
+        shape.ApplyTransformation(T);
+    }
+
+    private void Nodding(Shape shape, int point1, int point2) {
+        Vector3 moveDir;
+        if (!shape.MoveUp) {
+            if (shape.RotateCenter.x >= point1)
+                shape.MoveUp = true;
+            moveDir = Vector3.down;
+        } else {
+            if (shape.RotateCenter.x <= point2)
+                shape.MoveUp = false;
+            moveDir = Vector3.up;
         }
-        else {
-            IGB283.Matrix4x4 T = IGB283Transform.Translate(-shape.Center);
-            IGB283.Matrix4x4 R = IGB283Transform.Rotate(angle * Time.deltaTime, IGB283Transform.Axis.X);
-            IGB283.Matrix4x4 TReverse = IGB283Transform.Translate(shape.Center + Time.deltaTime * shape.Speed * moveDir);
-            shape.ApplyTransformation(TReverse * R * T);
-        }
+
+        Matrix3x3 T = IGB283Transform.Translate(-(Vector2)LowerArm.RotateCenter);
+        Matrix3x3 R = IGB283Transform.Rotate(-50f * Time.deltaTime);
+        Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)LowerArm.RotateCenter);
+
+        shape.ApplyTransformation(TReverse * R * T);
+
+
+
+
+
+
+
     }
 }
 

@@ -83,6 +83,8 @@ public class Controller : MonoBehaviour {
         if (gettingUp)
             GettingUp();
 
+        Nodding();
+
         ApplyVerticalMomentum();
         //Update the mesh to reflect changes
         UpdateMesh();
@@ -205,29 +207,20 @@ public class Controller : MonoBehaviour {
         shape.ApplyTransformation(T);
     }
 
-    private void Nodding(Shape shape, int point1, int point2) {
-        Vector3 moveDir;
-        if (!shape.MoveUp) {
-            if (shape.RotateCenter.x >= point1)
-                shape.MoveUp = true;
-            moveDir = Vector3.down;
-        } else {
-            if (shape.RotateCenter.x <= point2)
-                shape.MoveUp = false;
-            moveDir = Vector3.up;
+    private void Nodding() {
+        bool moveUp = false;
+        if (!moveUp) {
+            RotateShape(Head, Time.deltaTime * 20);
+            if (Mathf.Approximately(60, Head.Angle)) {
+                moveUp = true;
+            }
+        } else if (moveUp) {
+            RotateShape(Head, Time.deltaTime * -20);
+            if (Mathf.Approximately(0, Head.Angle)) {
+                moveUp = true;
+            }
+
         }
-
-        Matrix3x3 T = IGB283Transform.Translate(-(Vector2)LowerArm.RotateCenter);
-        Matrix3x3 R = IGB283Transform.Rotate(-50f * Time.deltaTime);
-        Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)LowerArm.RotateCenter);
-
-        shape.ApplyTransformation(TReverse * R * T);
-
-
-
-
-
-
 
     }
 }
