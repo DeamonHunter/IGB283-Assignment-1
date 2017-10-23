@@ -85,7 +85,8 @@ public class Controller : MonoBehaviour {
             GettingUp();
 
         Nodding();
-        Jump(Body,10 ,0);
+        //Jump(Body,10 ,0);
+        TranslateLeftAndRight(Body, 2, 0);
 
         ApplyVerticalMomentum();
         //Update the mesh to reflect changes
@@ -164,8 +165,6 @@ public class Controller : MonoBehaviour {
         Matrix3x3 TReverse = IGB283Transform.Translate((Vector2)shape.RotateCenter);
         shape.ApplyTransformation(TReverse * R * T);
         shape.Angle += angle;
-
-        TranslateLeftAndRight(Body, -50, 50);
     }
 
     /// <summary>
@@ -192,33 +191,43 @@ public class Controller : MonoBehaviour {
     }
 
     private void TranslateLeftAndRight(Shape shape, int point1, int point2) {
-
-        //Determine which direction to move the shape in.
-        Vector3 moveDir;
-        if (!shape.MoveLeft) {
-            if (shape.RotateCenter.x >= point1)
-                shape.MoveLeft = true;
-            moveDir = Vector3.right;
-        } else {
-            if (shape.RotateCenter.x <= point2)
-                shape.MoveLeft = false;
-            moveDir = Vector3.left;
+        int currentPoint = point1;
+        if (currentPoint == point1) {
+            Debug.Log("if statement entered");
+            if (shape.RotateCenter.x >= point1) {
+                Debug.Log("second if statement entered");
+                Debug.Log(shape.RotateCenter.x);
+                currentPoint = point2;
+            }
+        } else if (currentPoint == point2) {
+            Debug.Log("else if statement entered");
+            if (shape.RotateCenter.x <= point2) {
+                currentPoint = point1;
+                Debug.Log("second else if statement entered");
+                Debug.Log(shape.RotateCenter.x);
+            }
         }
+
+        Matrix3x3 T = IGB283Transform.Translate(new Vector2(currentPoint * Time.deltaTime, 0));
+        shape.ApplyTransformation(T);
 
     }
 
     private void Jump(Shape shape, int point1, int point2) {
         int currentPoint = point1;
         if (currentPoint == point1) {
-            if (shape.RotateCenter.y >= point1)
+            if (shape.RotateCenter.y >= point1) {
                 currentPoint = point2;
+            }
         } else if (currentPoint == point2) {
-            if (shape.RotateCenter.y <= point2)
+            if (shape.RotateCenter.y <= point2) {
                 currentPoint = point1;
+
+            }
         }
 
         Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, currentPoint * Time.deltaTime));
-        Body.ApplyTransformation(T);
+        shape.ApplyTransformation(T);
 
 
     }
