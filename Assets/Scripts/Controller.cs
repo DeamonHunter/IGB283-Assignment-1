@@ -32,6 +32,7 @@ public class Controller : MonoBehaviour {
     private Shape UpperArm;
     private Shape LowerArm;
     private Shape Body;
+    public GameObject BodyCollider;
 
     private bool fallingDown;
     private float verticalMomentum;
@@ -40,6 +41,10 @@ public class Controller : MonoBehaviour {
     private bool gettingUp;
     private bool moveUp = false;
     private float jumpCooldown;
+    private bool moveRight = true;
+    private float walkingSpeed = 5;
+    private bool jumpingUp;
+    private bool jumpingForward;
 
     /// <summary>
     /// Used to initialise all shapes.
@@ -89,14 +94,31 @@ public class Controller : MonoBehaviour {
         else
         {
             Nodding();
+            if (jumpingUp)
+                JumpStraightUp();
+            else if (jumpingForward)
+            {
+                JumpForward();
+                if (!onGround)
+                    TranslateLeftAndRight(onGround);
+            }
+            else {
+                TranslateLeftAndRight(onGround);
+                if (Input.GetKey(KeyCode.W))
+                    JumpStraightUp();
+                else if (Input.GetKey(KeyCode.S))
+                    JumpForward(); 
+            }
+
             if (onGround)
             {
+                jumpCooldown -= Time.deltaTime;
                 if (jumpCooldown <= 0)
-                    JumpStraightUp();
-                else
-                    jumpCooldown -= Time.deltaTime;
+                {
+                    jumpingUp = false;
+                    jumpingForward = false;
+                }
             }
-            //TranslateLeftAndRight(Body, 2, 0);
         }
 
         //Update the mesh to reflect changes
@@ -105,19 +127,19 @@ public class Controller : MonoBehaviour {
 
     private bool ApplyVerticalMomentum()
     {
-        
-        var hit = Physics2D.Raycast(new Vector2((Body.Vertices[0].x + Body.Vertices[1].x) / 2, Body.Vertices[0].y),
+
+        var hit = Physics2D.Raycast(new Vector2((Body.Vertices[0].x + Body.Vertices[2].x) / 2, Body.Vertices[0].y),
             Vector2.down, 0.05f);
         if (hit && verticalMomentum <= 0)
         {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, -hit.distance));
-            Body.ApplyTransformation(T);
+            AdjustBody(T);
             verticalMomentum = 0;
             return true;
         }
         else {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, verticalMomentum * Time.deltaTime));
-            Body.ApplyTransformation(T);
+            AdjustBody(T);
             verticalMomentum += gravity * Time.deltaTime;
             return false;
         }
@@ -203,33 +225,44 @@ public class Controller : MonoBehaviour {
         mesh.colors = new Color[] { Color.white, Color.white, Color.white, Color.white, Color.black, Color.black, Color.black, Color.black, Color.red, Color.red, Color.red, Color.red, Color.blue, Color.blue, Color.blue, Color.blue };
     }
 
-    private void TranslateLeftAndRight(Shape shape, int point1, int point2) {
-        int currentPoint = point1;
-        if (currentPoint == point1) {
-            Debug.Log("if statement entered");
-            if (shape.RotateCenter.x >= point1) {
-                Debug.Log("second if statement entered");
-                Debug.Log(shape.RotateCenter.x);
-                currentPoint = point2;
+    private void TranslateLeftAndRight(bool onGround)
+    {
+        float distance = walkingSpeed * Time.deltaTime;
+        Vector2 direction = moveRight ? Vector2.right * distance : Vector2.left * distance;
+        Vector2 pos = new Vector2(moveRight ? Body.Vertices[2].x : Body.Vertices[0].x,
+            (Body.Vertices[0].y + Body.Vertices[1].y) / 2);
+        var hit = Physics2D.Raycast(pos, direction, distance, 1);
+        if (hit) {
+            if (onGround)
+            {
+                //Move Head Angle here
+                moveRight = !moveRight;
             }
-        } else if (currentPoint == point2) {
-            Debug.Log("else if statement entered");
-            if (shape.RotateCenter.x <= point2) {
-                currentPoint = point1;
-                Debug.Log("second else if statement entered");
-                Debug.Log(shape.RotateCenter.x);
-            }
+            else
+                return;
         }
-
-        Matrix3x3 T = IGB283Transform.Translate(new Vector2(currentPoint * Time.deltaTime, 0));
-        shape.ApplyTransformation(T);
-
+        Matrix3x3 T = IGB283Transform.Translate(direction);
+        AdjustBody(T);
     }
 
     private void JumpStraightUp()
     {
-        verticalMomentum = 8;
-        jumpCooldown = 0.5f;
+        if (!jumpingUp && jumpCooldown <= 0)
+        {
+            verticalMomentum = 9;
+            jumpCooldown = 0.5f;
+            jumpingUp = true;
+        }
+        // Do animation here
+    }
+
+    private void JumpForward() {
+        if (!jumpingForward && jumpCooldown <= 0) {
+            verticalMomentum = 5;
+            jumpCooldown = 0.5f;
+            jumpingForward = true;
+        }
+        // Do animation here
     }
 
     private void Nodding() {
@@ -246,6 +279,13 @@ public class Controller : MonoBehaviour {
 
         }
 
+    }
+
+    private void AdjustBody(Matrix3x3 m)
+    {
+        Body.ApplyTransformation(m);
+        BodyCollider.transform.position = m * BodyCollider.transform.position;
+        BodyCollider.transform.rotation = Quaternion.Euler(0,0,Body.Angle);
     }
 }
 
