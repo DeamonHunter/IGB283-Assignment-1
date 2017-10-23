@@ -85,6 +85,7 @@ public class Controller : MonoBehaviour {
             GettingUp();
 
         Nodding();
+        Jump(Body,10 ,0);
 
         ApplyVerticalMomentum();
         //Update the mesh to reflect changes
@@ -204,8 +205,22 @@ public class Controller : MonoBehaviour {
             moveDir = Vector3.left;
         }
 
-        Matrix3x3 T = IGB283Transform.Translate(Time.deltaTime * shape.Speed * new Vector2(moveDir.x, moveDir.y));
-        shape.ApplyTransformation(T);
+    }
+
+    private void Jump(Shape shape, int point1, int point2) {
+        int currentPoint = point1;
+        if (currentPoint == point1) {
+            if (shape.RotateCenter.y >= point1)
+                currentPoint = point2;
+        } else if (currentPoint == point2) {
+            if (shape.RotateCenter.y <= point2)
+                currentPoint = point1;
+        }
+
+        Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, currentPoint * Time.deltaTime));
+        Body.ApplyTransformation(T);
+
+
     }
 
     private void Nodding() {
@@ -213,7 +228,6 @@ public class Controller : MonoBehaviour {
             RotateShape(Head, Time.deltaTime * 60);
             if (90 < Head.Angle) {
                 moveUp = true;
-                Debug.Log(moveUp);
             }
         } else {
             RotateShape(Head, Time.deltaTime * -60);
