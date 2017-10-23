@@ -45,6 +45,7 @@ public class Controller : MonoBehaviour {
     private float walkingSpeed = 5;
     private bool jumpingUp;
     private bool jumpingForward;
+    bool movingForward = true;
 
     /// <summary>
     /// Used to initialise all shapes.
@@ -103,11 +104,18 @@ public class Controller : MonoBehaviour {
                     TranslateLeftAndRight(onGround);
             }
             else {
+                if (Input.GetKey(KeyCode.A))
+                    moveRight = false;
+                else if (Input.GetKey(KeyCode.D))
+                    moveRight = true;
                 TranslateLeftAndRight(onGround);
-                if (Input.GetKey(KeyCode.W))
+                if (Input.GetKey(KeyCode.W)) {
+                    movingForward = true;
                     JumpStraightUp();
-                else if (Input.GetKey(KeyCode.S))
-                    JumpForward(); 
+                } else if (Input.GetKey(KeyCode.S)) {
+                    movingForward = true;
+                    JumpForward();
+                }
             }
 
             if (onGround)
@@ -144,7 +152,6 @@ public class Controller : MonoBehaviour {
             return false;
         }
     }
-
 
     private void FallDown()
     {
@@ -254,6 +261,23 @@ public class Controller : MonoBehaviour {
             jumpingUp = true;
         }
         // Do animation here
+        // Do animation here
+        if (UpperArm.Angle < 15 && movingForward) {
+            Debug.Log("first statement");
+            RotateShape(UpperArm, Time.deltaTime * 50);
+            RotateShape(LowerArm, Time.deltaTime * 40);
+            RotateShape(Head, Time.deltaTime * 30);
+        } else if (UpperArm.Angle >= 15 && movingForward) {
+            Debug.Log("second statement");
+            movingForward = false;
+        } else if (UpperArm.Angle > 0 && !movingForward) {
+            Debug.Log("third statement");
+            Debug.Log(UpperArm.Angle);
+            RotateShape(UpperArm, Time.deltaTime * -50);
+            RotateShape(LowerArm, Time.deltaTime * -40);
+            RotateShape(Head, Time.deltaTime * -30);
+        }
+
     }
 
     private void JumpForward() {
@@ -263,6 +287,21 @@ public class Controller : MonoBehaviour {
             jumpingForward = true;
         }
         // Do animation here
+        if (UpperArm.Angle < 30 && movingForward) {
+            Debug.Log("first statement");
+            RotateShape(UpperArm, Time.deltaTime * 60);
+            RotateShape(LowerArm, Time.deltaTime * 50);
+            RotateShape(Head, Time.deltaTime * 40);
+        } else if (UpperArm.Angle >= 30 && movingForward) {
+            Debug.Log("second statement");
+            movingForward = false;
+        } else if (UpperArm.Angle > 0 && !movingForward) {
+            Debug.Log("third statement");
+            Debug.Log(UpperArm.Angle);
+            RotateShape(UpperArm, Time.deltaTime * -60);
+            RotateShape(LowerArm, Time.deltaTime * -50);
+            RotateShape(Head, Time.deltaTime * -40);
+        }
     }
 
     private void Nodding() {
