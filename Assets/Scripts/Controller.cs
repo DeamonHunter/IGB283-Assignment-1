@@ -39,6 +39,7 @@ public class Controller : MonoBehaviour {
     private float gettingUpCooldown;
     private bool gettingUp;
     private bool moveUp = false;
+    private float jumpCooldown;
 
     /// <summary>
     /// Used to initialise all shapes.
@@ -79,34 +80,46 @@ public class Controller : MonoBehaviour {
             if (Input.GetKeyDown(KeyCode.G))
                 fallingDown = true;
         }
+        bool onGround = ApplyVerticalMomentum();
+
         if (fallingDown)
             FallDown();
-        if (gettingUp)
+        else if (gettingUp)
             GettingUp();
+        else
+        {
+            Nodding();
+            if (onGround)
+            {
+                if (jumpCooldown <= 0)
+                    JumpStraightUp();
+                else
+                    jumpCooldown -= Time.deltaTime;
+            }
+            //TranslateLeftAndRight(Body, 2, 0);
+        }
 
-        Nodding();
-        //Jump(Body,10 ,0);
-        TranslateLeftAndRight(Body, 2, 0);
-
-        ApplyVerticalMomentum();
         //Update the mesh to reflect changes
         UpdateMesh();
     }
 
-    private void ApplyVerticalMomentum()
+    private bool ApplyVerticalMomentum()
     {
+        
         var hit = Physics2D.Raycast(new Vector2((Body.Vertices[0].x + Body.Vertices[1].x) / 2, Body.Vertices[0].y),
             Vector2.down, 0.05f);
-        if (hit)
+        if (hit && verticalMomentum <= 0)
         {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, -hit.distance));
             Body.ApplyTransformation(T);
             verticalMomentum = 0;
+            return true;
         }
         else {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, verticalMomentum * Time.deltaTime));
             Body.ApplyTransformation(T);
             verticalMomentum += gravity * Time.deltaTime;
+            return false;
         }
     }
 
@@ -213,33 +226,20 @@ public class Controller : MonoBehaviour {
 
     }
 
-    private void Jump(Shape shape, int point1, int point2) {
-        int currentPoint = point1;
-        if (currentPoint == point1) {
-            if (shape.RotateCenter.y >= point1) {
-                currentPoint = point2;
-            }
-        } else if (currentPoint == point2) {
-            if (shape.RotateCenter.y <= point2) {
-                currentPoint = point1;
-
-            }
-        }
-
-        Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, currentPoint * Time.deltaTime));
-        shape.ApplyTransformation(T);
-
-
+    private void JumpStraightUp()
+    {
+        verticalMomentum = 8;
+        jumpCooldown = 0.5f;
     }
 
     private void Nodding() {
         if (!moveUp) {
-            RotateShape(Head, Time.deltaTime * 60);
+            RotateShape(Head, Time.deltaTime * 140);
             if (90 < Head.Angle) {
                 moveUp = true;
             }
         } else {
-            RotateShape(Head, Time.deltaTime * -60);
+            RotateShape(Head, Time.deltaTime * -120);
             if (30 > Head.Angle) {
                 moveUp = false;
             }
