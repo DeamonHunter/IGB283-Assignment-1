@@ -29,8 +29,11 @@ public class Controller : MonoBehaviour {
 
 
     private Shape Head;
+    public GameObject HeadCollider;
     private Shape UpperArm;
+    public GameObject UpperArmCollider;
     private Shape LowerArm;
+    public GameObject LowerArmCollider;
     private Shape Body;
     public GameObject BodyCollider;
 
@@ -42,7 +45,8 @@ public class Controller : MonoBehaviour {
     private bool moveUp = false;
     private float jumpCooldown;
     private bool moveRight = true;
-    private float walkingSpeed = 5;
+    private float walkingSpeed = 3;
+    private float jumpingSpeed = 4.5f;
     private bool jumpingUp;
     private bool jumpingForward;
     bool movingForward = true;
@@ -60,20 +64,25 @@ public class Controller : MonoBehaviour {
 
         Body = new Square(new Vector3(-1f, -1f, 0), new Vector3(-1f, 0f, 0), new Vector3(1f, 0f, 0), new Vector3(1, -1, 0));
         Body.RotateCenter = new Vector3(0, -0.5f, 0);
+        Body.collider = BodyCollider;
+        Body.Parent = true;
         shapes.Add(Body);
 
         UpperArm = new Square(new Vector3(-0.25f, 0f, 0), new Vector3(-0.25f, 2f, 0), new Vector3(0.25f, 2f, 0), new Vector3(0.25f, 0f, 0));
         UpperArm.RotateCenter = new Vector3(0, 0f, 0);
+        UpperArm.collider = UpperArmCollider;
         Body.AddChild(UpperArm);
         shapes.Add(UpperArm);
 
         LowerArm = new Square(new Vector3(-0.25f, 2f, 0), new Vector3(-0.25f, 4f, 0), new Vector3(0.25f, 4f, 0), new Vector3(0.25f, 2f, 0));
         LowerArm.RotateCenter = new Vector3(0, 2f, 0);
+        LowerArm.collider = LowerArmCollider;
         UpperArm.AddChild(LowerArm);
         shapes.Add(LowerArm);
 
         Head = new Square(new Vector3(-0.1f, 4f, 0), new Vector3(-0.1f, 5f, 0), new Vector3(0.1f, 5f, 0), new Vector3(0.1f, 4f, 0));
         Head.RotateCenter = new Vector3(0, 4f, 0);
+        Head.collider = HeadCollider;
         LowerArm.AddChild(Head);
         shapes.Add(Head);
     }
@@ -142,13 +151,13 @@ public class Controller : MonoBehaviour {
         if (hit && verticalMomentum <= 0)
         {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, -hit.distance));
-            AdjustBody(T);
+            Body.ApplyTransformation(T);
             verticalMomentum = 0;
             return true;
         }
         else {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, verticalMomentum * Time.deltaTime));
-            AdjustBody(T);
+            Body.ApplyTransformation(T);
             verticalMomentum += gravity * Time.deltaTime;
             return false;
         }
@@ -156,11 +165,17 @@ public class Controller : MonoBehaviour {
 
     private void FallDown()
     {
-        if (UpperArm.Angle > -110)
-        {
-            RotateShape(UpperArm, Time.deltaTime * -200);
+        int direction = moveRight? 1: -1;
+        if ((Head.Angle < 0 && moveRight) || (Head.Angle > 0 && !moveRight)) {
+            RotateShape(Head, Time.deltaTime * 160 * direction);
+        }
+        if ((LowerArm.Angle < 15 && moveRight) || (LowerArm.Angle > -15 && !moveRight)) {
+            RotateShape(LowerArm, Time.deltaTime * 80 * direction);
+        }
 
-            RotateShape(LowerArm, Time.deltaTime * 30);
+        if ((UpperArm.Angle > -110 && moveRight) || (UpperArm.Angle < 110 && !moveRight))
+        {
+            RotateShape(UpperArm, Time.deltaTime * -200 * direction);
         }
         else
         {
@@ -179,18 +194,20 @@ public class Controller : MonoBehaviour {
             return;
         }
 
-        if (UpperArm.Angle < -60) {
-            RotateShape(UpperArm, Time.deltaTime * 40);
-            RotateShape(LowerArm, Time.deltaTime * 30);
-            RotateShape(Head, Time.deltaTime * 30);
+        int direction = moveRight ? 1 : -1;
+
+        if ((UpperArm.Angle < -60 && moveRight) || (UpperArm.Angle > 60 && !moveRight)) {
+            RotateShape(UpperArm, Time.deltaTime * 40 * direction);
+            RotateShape(LowerArm, Time.deltaTime * 30 * direction);
+            RotateShape(Head, Time.deltaTime * 30 * direction);
         }
-        else if (UpperArm.Angle < 0)
+        else if ((UpperArm.Angle < 0 && moveRight) || (UpperArm.Angle > 0 && !moveRight))
         {
-            RotateShape(UpperArm, Time.deltaTime * 100);
-            if (LowerArm.Angle > 0)
-                RotateShape(LowerArm, Time.deltaTime * -100);
-            if (Head.Angle > 0)
-                RotateShape(Head, Time.deltaTime * -50);
+            RotateShape(UpperArm, Time.deltaTime * 100 * direction);
+            if ((LowerArm.Angle > 0 && moveRight) || (LowerArm.Angle < 0 && !moveRight))
+                RotateShape(LowerArm, Time.deltaTime * -100 * direction);
+            if ((Head.Angle > 0 && moveRight) || (Head.Angle < 0 && !moveRight))
+                RotateShape(Head, Time.deltaTime * -50 * direction);
         }
         else
         {
@@ -250,7 +267,7 @@ public class Controller : MonoBehaviour {
                 return;
         }
         Matrix3x3 T = IGB283Transform.Translate(direction);
-        AdjustBody(T);
+        Body.ApplyTransformation(T);
     }
 
     private void JumpStraightUp()
@@ -308,14 +325,19 @@ public class Controller : MonoBehaviour {
     }
 
     private void Nodding() {
+        int direction = moveRight ? 1 : -1;
         if (!moveUp) {
-            RotateShape(Head, Time.deltaTime * 140);
-            if (90 < Head.Angle) {
+            RotateShape(Head, Time.deltaTime * -140 * direction);
+            RotateShape(LowerArm, Time.deltaTime * -28 * direction);
+            RotateShape(UpperArm, Time.deltaTime * 14 * direction);
+            if ((90 < Head.Angle && !moveRight) || (-90 > Head.Angle && moveRight)) {
                 moveUp = true;
             }
         } else {
-            RotateShape(Head, Time.deltaTime * -120);
-            if (30 > Head.Angle) {
+            RotateShape(Head, Time.deltaTime * 120 * direction);
+            RotateShape(LowerArm, Time.deltaTime * 24 * direction);
+            RotateShape(UpperArm, Time.deltaTime * -12 * direction);
+            if ((30 > Head.Angle && !moveRight) || (-30 < Head.Angle && moveRight)) {
                 moveUp = false;
             }
 
@@ -323,12 +345,7 @@ public class Controller : MonoBehaviour {
 
     }
 
-    private void AdjustBody(Matrix3x3 m)
-    {
-        Body.ApplyTransformation(m);
-        BodyCollider.transform.position = m * BodyCollider.transform.position;
-        BodyCollider.transform.rotation = Quaternion.Euler(0,0,Body.Angle);
-    }
+    
 }
 
 

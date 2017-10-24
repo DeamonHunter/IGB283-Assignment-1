@@ -62,6 +62,9 @@ public abstract class Shape {
     /// <returns>An array of points that will render the shape correctly.</returns>
     public abstract int[] GetTriangles(int offset);
 
+    public GameObject collider;
+    public bool Parent;
+
     public Shape() {
         children = new List<Shape>();
     }
@@ -74,7 +77,7 @@ public abstract class Shape {
     /// Apply the matrix transformation to all points in this shape. Ignores 3rd dimension.
     /// </summary>
     /// <param name="m">A 3x3 transformation matrix.</param>
-    public void ApplyTransformation(Matrix3x3 m) {
+    public void ApplyTransformation(Matrix3x3 m, float angle = 0) {
         for (int i = 0; i < Vertices.Length; i++) {
             Vector3 vert = Vertices[i];
             float z = vert.z;
@@ -91,6 +94,13 @@ public abstract class Shape {
         vert2.z = 1; //Set Z correctly in order to translate.
         RotateCenter = m * vert2;
         RotateCenter.z = z2; //Reset Z
+
+        Angle += angle;
+        if (collider != null) {
+            if (Parent)
+                collider.transform.position = m * collider.transform.position;
+            collider.transform.localRotation = Quaternion.Euler(0, 0, Angle);
+        }
     }
 
     /// <summary>
