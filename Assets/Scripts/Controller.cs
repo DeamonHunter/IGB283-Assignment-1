@@ -46,6 +46,7 @@ public class Controller : MonoBehaviour {
     private bool jumpingUp;
     private bool jumpingForward;
     bool movingForward = true;
+    private bool animating;
 
     /// <summary>
     /// Used to initialise all shapes.
@@ -121,7 +122,7 @@ public class Controller : MonoBehaviour {
             if (onGround)
             {
                 jumpCooldown -= Time.deltaTime;
-                if (jumpCooldown <= 0)
+                if (jumpCooldown <= 0 && !animating)
                 {
                     jumpingUp = false;
                     jumpingForward = false;
@@ -254,53 +255,55 @@ public class Controller : MonoBehaviour {
 
     private void JumpStraightUp()
     {
-        if (!jumpingUp && jumpCooldown <= 0)
+        if (!jumpingUp && !animating && jumpCooldown <= 0)
         {
             verticalMomentum = 9;
             jumpCooldown = 0.5f;
             jumpingUp = true;
+            animating = true;
         }
         // Do animation here
         // Do animation here
         if (UpperArm.Angle < 15 && movingForward) {
-            Debug.Log("first statement");
             RotateShape(UpperArm, Time.deltaTime * 50);
             RotateShape(LowerArm, Time.deltaTime * 40);
             RotateShape(Head, Time.deltaTime * 30);
         } else if (UpperArm.Angle >= 15 && movingForward) {
-            Debug.Log("second statement");
             movingForward = false;
         } else if (UpperArm.Angle > 0 && !movingForward) {
-            Debug.Log("third statement");
             Debug.Log(UpperArm.Angle);
             RotateShape(UpperArm, Time.deltaTime * -50);
             RotateShape(LowerArm, Time.deltaTime * -40);
             RotateShape(Head, Time.deltaTime * -30);
         }
+        else {
+            animating = false;
+        }
 
     }
 
     private void JumpForward() {
-        if (!jumpingForward && jumpCooldown <= 0) {
+        if (!jumpingForward && !animating && jumpCooldown <= 0) {
             verticalMomentum = 5;
             jumpCooldown = 0.5f;
             jumpingForward = true;
+            animating = true;
         }
         // Do animation here
         if (UpperArm.Angle < 30 && movingForward) {
-            Debug.Log("first statement");
             RotateShape(UpperArm, Time.deltaTime * 60);
             RotateShape(LowerArm, Time.deltaTime * 50);
             RotateShape(Head, Time.deltaTime * 40);
         } else if (UpperArm.Angle >= 30 && movingForward) {
-            Debug.Log("second statement");
             movingForward = false;
         } else if (UpperArm.Angle > 0 && !movingForward) {
-            Debug.Log("third statement");
             Debug.Log(UpperArm.Angle);
             RotateShape(UpperArm, Time.deltaTime * -60);
             RotateShape(LowerArm, Time.deltaTime * -50);
             RotateShape(Head, Time.deltaTime * -40);
+        }
+        else {
+            animating = false;
         }
     }
 
