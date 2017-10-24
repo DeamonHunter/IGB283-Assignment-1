@@ -14,7 +14,8 @@ public class BallCreator : MonoBehaviour
         for (int i = 0; i < NumOfBalls; i++)
         {
             Vector3 pos = new Vector3(Random.Range(XBounds.x, XBounds.y), Random.Range(YBounds.x, YBounds.y));
-            Instantiate(BallPrefab, pos, transform.rotation, transform);
+            var ball = Instantiate(BallPrefab, pos, transform.rotation, transform);
+            ball.GetComponent<SpriteRenderer>().color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
         }
     }
 }
