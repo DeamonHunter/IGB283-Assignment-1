@@ -63,25 +63,29 @@ public class Controller : MonoBehaviour {
 
         shapes = new List<Shape>();
 
-        Body = new Square(new Vector3(-1f, -1f, 0), new Vector3(-1f, 0f, 0), new Vector3(1f, 0f, 0), new Vector3(1, -1, 0));
+        Body = new Square(new Vector3(-1f, -1f, 0), new Vector3(-1f, 0f, 0), 
+            new Vector3(1f, 0f, 0), new Vector3(1, -1, 0));
         Body.RotateCenter = new Vector3(0, -0.5f, 0);
         Body.collider = BodyCollider;
         Body.Parent = true;
         shapes.Add(Body);
 
-        UpperArm = new Square(new Vector3(-0.25f, 0f, 0), new Vector3(-0.25f, 2f, 0), new Vector3(0.25f, 2f, 0), new Vector3(0.25f, 0f, 0));
+        UpperArm = new Square(new Vector3(-0.25f, 0f, 0), new Vector3(-0.25f, 2f, 0), 
+            new Vector3(0.25f, 2f, 0), new Vector3(0.25f, 0f, 0));
         UpperArm.RotateCenter = new Vector3(0, 0f, 0);
         UpperArm.collider = UpperArmCollider;
         Body.AddChild(UpperArm);
         shapes.Add(UpperArm);
 
-        LowerArm = new Square(new Vector3(-0.25f, 2f, 0), new Vector3(-0.25f, 4f, 0), new Vector3(0.25f, 4f, 0), new Vector3(0.25f, 2f, 0));
+        LowerArm = new Square(new Vector3(-0.25f, 2f, 0), new Vector3(-0.25f, 4f, 0), 
+            new Vector3(0.25f, 4f, 0), new Vector3(0.25f, 2f, 0));
         LowerArm.RotateCenter = new Vector3(0, 2f, 0);
         LowerArm.collider = LowerArmCollider;
         UpperArm.AddChild(LowerArm);
         shapes.Add(LowerArm);
 
-        Head = new Square(new Vector3(-0.1f, 4f, 0), new Vector3(-0.1f, 5f, 0), new Vector3(0.1f, 5f, 0), new Vector3(0.1f, 4f, 0));
+        Head = new Square(new Vector3(-0.1f, 4f, 0), new Vector3(-0.1f, 5f, 0),
+            new Vector3(0.1f, 5f, 0), new Vector3(0.1f, 4f, 0));
         Head.RotateCenter = new Vector3(0, 4f, 0);
         Head.collider = HeadCollider;
         LowerArm.AddChild(Head);
@@ -94,7 +98,7 @@ public class Controller : MonoBehaviour {
     {
         if (!gettingUp && !fallingDown)
         {
-            if (Input.GetKeyDown(KeyCode.G))
+            if (Input.GetKeyDown(KeyCode.Z))
                 fallingDown = true;
         }
         bool onGround = ApplyVerticalMomentum();
@@ -262,7 +266,6 @@ public class Controller : MonoBehaviour {
         if (hit) {
             if (onGround)
             {
-                //Move Head Angle here
                 moveRight = !moveRight;
             }
             else
@@ -282,7 +285,6 @@ public class Controller : MonoBehaviour {
             animating = true;
         }
         // Do animation here
-        // Do animation here
         if (UpperArm.Angle < 15 && movingForward) {
             RotateShape(UpperArm, Time.deltaTime * 50);
             RotateShape(LowerArm, Time.deltaTime * 40);
@@ -290,7 +292,6 @@ public class Controller : MonoBehaviour {
         } else if (UpperArm.Angle >= 15 && movingForward) {
             movingForward = false;
         } else if (UpperArm.Angle > 0 && !movingForward) {
-            Debug.Log(UpperArm.Angle);
             RotateShape(UpperArm, Time.deltaTime * -50);
             RotateShape(LowerArm, Time.deltaTime * -40);
             RotateShape(Head, Time.deltaTime * -30);
@@ -316,7 +317,6 @@ public class Controller : MonoBehaviour {
         } else if (UpperArm.Angle >= 30 && movingForward) {
             movingForward = false;
         } else if (UpperArm.Angle > 0 && !movingForward) {
-            Debug.Log(UpperArm.Angle);
             RotateShape(UpperArm, Time.deltaTime * -60);
             RotateShape(LowerArm, Time.deltaTime * -50);
             RotateShape(Head, Time.deltaTime * -40);
