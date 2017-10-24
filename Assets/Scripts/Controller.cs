@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using IGB283;
 using UnityEngine;
@@ -46,7 +47,7 @@ public class Controller : MonoBehaviour {
     private float jumpCooldown;
     private bool moveRight = true;
     private float walkingSpeed = 3;
-    private float jumpingSpeed = 4.5f;
+    private float jumpingSpeed = 5.5f;
     private bool jumpingUp;
     private bool jumpingForward;
     bool movingForward = true;
@@ -147,7 +148,7 @@ public class Controller : MonoBehaviour {
     {
 
         var hit = Physics2D.Raycast(new Vector2((Body.Vertices[0].x + Body.Vertices[2].x) / 2, Body.Vertices[0].y),
-            Vector2.down, 0.05f);
+            Vector2.down, 0.01f);
         if (hit && verticalMomentum <= 0)
         {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, -hit.distance));
@@ -246,13 +247,14 @@ public class Controller : MonoBehaviour {
         //Set Mesh vertex and triangle positions
         mesh.vertices = points.ToArray();
         mesh.triangles = triangles.ToArray();
+        
 
-        mesh.colors = new Color[] { Color.white, Color.white, Color.white, Color.white, Color.black, Color.black, Color.black, Color.black, Color.red, Color.red, Color.red, Color.red, Color.blue, Color.blue, Color.blue, Color.blue };
+        mesh.colors = Colours;
     }
 
     private void TranslateLeftAndRight(bool onGround)
     {
-        float distance = walkingSpeed * Time.deltaTime;
+        float distance = onGround? walkingSpeed * Time.deltaTime : jumpingSpeed * Time.deltaTime;
         Vector2 direction = moveRight ? Vector2.right * distance : Vector2.left * distance;
         Vector2 pos = new Vector2(moveRight ? Body.Vertices[2].x : Body.Vertices[0].x,
             (Body.Vertices[0].y + Body.Vertices[1].y) / 2);
@@ -301,7 +303,7 @@ public class Controller : MonoBehaviour {
 
     private void JumpForward() {
         if (!jumpingForward && !animating && jumpCooldown <= 0) {
-            verticalMomentum = 5;
+            verticalMomentum = 6.5f;
             jumpCooldown = 0.5f;
             jumpingForward = true;
             animating = true;
@@ -330,14 +332,14 @@ public class Controller : MonoBehaviour {
             RotateShape(Head, Time.deltaTime * -140 * direction);
             RotateShape(LowerArm, Time.deltaTime * -28 * direction);
             RotateShape(UpperArm, Time.deltaTime * 14 * direction);
-            if ((90 < Head.Angle && !moveRight) || (-90 > Head.Angle && moveRight)) {
+            if ((60 < Head.Angle && !moveRight) || (-60 > Head.Angle && moveRight)) {
                 moveUp = true;
             }
         } else {
             RotateShape(Head, Time.deltaTime * 120 * direction);
             RotateShape(LowerArm, Time.deltaTime * 24 * direction);
             RotateShape(UpperArm, Time.deltaTime * -12 * direction);
-            if ((30 > Head.Angle && !moveRight) || (-30 < Head.Angle && moveRight)) {
+            if ((15 > Head.Angle && !moveRight) || (-15 < Head.Angle && moveRight)) {
                 moveUp = false;
             }
 
