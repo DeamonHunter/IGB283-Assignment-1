@@ -11,10 +11,18 @@ using UnityEngine.UI;
 /// </summary>
 public class Controller : MonoBehaviour {
     #region Public Variables
-    public float DragCooldown = 0.1f;
-    public bool ThreeDimensional;
     public Color[] Colours;
-    public Slider[] Sliders;
+    #endregion
+
+    #region Robot Parts
+    private Shape head;
+    public GameObject HeadCollider;
+    private Shape upperArm;
+    public GameObject UpperArmCollider;
+    private Shape lowerArm;
+    public GameObject LowerArmCollider;
+    private Shape body;
+    public GameObject BodyCollider;
     #endregion
 
     #region private Variables
@@ -22,32 +30,23 @@ public class Controller : MonoBehaviour {
     private Mesh mesh;
 
     //Constants
-    private const float maxSpeed = 10;
+    private const float walkingSpeed = 3;
+    private const float jumpingSpeed = 5.5f;
+    private const float gravity = -18;
 
     //Shapes
     private List<Shape> shapes;
     #endregion
 
 
-    private Shape Head;
-    public GameObject HeadCollider;
-    private Shape UpperArm;
-    public GameObject UpperArmCollider;
-    private Shape LowerArm;
-    public GameObject LowerArmCollider;
-    private Shape Body;
-    public GameObject BodyCollider;
 
     private bool fallingDown;
     private float verticalMomentum;
-    private const float gravity = -18;
     private float gettingUpCooldown;
     private bool gettingUp;
-    private bool moveUp = false;
+    private bool moveUp;
     private float jumpCooldown;
     private bool moveRight = true;
-    private float walkingSpeed = 3;
-    private float jumpingSpeed = 5.5f;
     private bool jumpingUp;
     private bool jumpingForward;
     bool movingForward = true;
@@ -63,29 +62,29 @@ public class Controller : MonoBehaviour {
 
         shapes = new List<Shape>();
 
-        Body = new Square(new Vector3(-1f, -1f, 0), new Vector3(-1f, 0f, 0), new Vector3(1f, 0f, 0), new Vector3(1, -1, 0));
-        Body.RotateCenter = new Vector3(0, -0.5f, 0);
-        Body.collider = BodyCollider;
-        Body.Parent = true;
-        shapes.Add(Body);
+        body = new Square(new Vector3(-1f, -1f, 0), new Vector3(-1f, 0f, 0), new Vector3(1f, 0f, 0), new Vector3(1, -1, 0));
+        body.RotateCenter = new Vector3(0, -0.5f, 0);
+        body.collider = BodyCollider;
+        body.Parent = true;
+        shapes.Add(body);
 
-        UpperArm = new Square(new Vector3(-0.25f, 0f, 0), new Vector3(-0.25f, 2f, 0), new Vector3(0.25f, 2f, 0), new Vector3(0.25f, 0f, 0));
-        UpperArm.RotateCenter = new Vector3(0, 0f, 0);
-        UpperArm.collider = UpperArmCollider;
-        Body.AddChild(UpperArm);
-        shapes.Add(UpperArm);
+        upperArm = new Square(new Vector3(-0.25f, 0f, 0), new Vector3(-0.25f, 2f, 0), new Vector3(0.25f, 2f, 0), new Vector3(0.25f, 0f, 0));
+        upperArm.RotateCenter = new Vector3(0, 0f, 0);
+        upperArm.collider = UpperArmCollider;
+        body.AddChild(upperArm);
+        shapes.Add(upperArm);
 
-        LowerArm = new Square(new Vector3(-0.25f, 2f, 0), new Vector3(-0.25f, 4f, 0), new Vector3(0.25f, 4f, 0), new Vector3(0.25f, 2f, 0));
-        LowerArm.RotateCenter = new Vector3(0, 2f, 0);
-        LowerArm.collider = LowerArmCollider;
-        UpperArm.AddChild(LowerArm);
-        shapes.Add(LowerArm);
+        lowerArm = new Square(new Vector3(-0.25f, 2f, 0), new Vector3(-0.25f, 4f, 0), new Vector3(0.25f, 4f, 0), new Vector3(0.25f, 2f, 0));
+        lowerArm.RotateCenter = new Vector3(0, 2f, 0);
+        lowerArm.collider = LowerArmCollider;
+        upperArm.AddChild(lowerArm);
+        shapes.Add(lowerArm);
 
-        Head = new Square(new Vector3(-0.1f, 4f, 0), new Vector3(-0.1f, 5f, 0), new Vector3(0.1f, 5f, 0), new Vector3(0.1f, 4f, 0));
-        Head.RotateCenter = new Vector3(0, 4f, 0);
-        Head.collider = HeadCollider;
-        LowerArm.AddChild(Head);
-        shapes.Add(Head);
+        head = new Square(new Vector3(-0.1f, 4f, 0), new Vector3(-0.1f, 5f, 0), new Vector3(0.1f, 5f, 0), new Vector3(0.1f, 4f, 0));
+        head.RotateCenter = new Vector3(0, 4f, 0);
+        head.collider = HeadCollider;
+        lowerArm.AddChild(head);
+        shapes.Add(head);
     }
 
 
@@ -147,18 +146,18 @@ public class Controller : MonoBehaviour {
     private bool ApplyVerticalMomentum()
     {
 
-        var hit = Physics2D.Raycast(new Vector2((Body.Vertices[0].x + Body.Vertices[2].x) / 2, Body.Vertices[0].y),
+        var hit = Physics2D.Raycast(new Vector2((body.Vertices[0].x + body.Vertices[2].x) / 2, body.Vertices[0].y),
             Vector2.down, 0.01f);
         if (hit && verticalMomentum <= 0)
         {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, -hit.distance));
-            Body.ApplyTransformation(T);
+            body.ApplyTransformation(T);
             verticalMomentum = 0;
             return true;
         }
         else {
             Matrix3x3 T = IGB283Transform.Translate(new Vector2(0, verticalMomentum * Time.deltaTime));
-            Body.ApplyTransformation(T);
+            body.ApplyTransformation(T);
             verticalMomentum += gravity * Time.deltaTime;
             return false;
         }
@@ -167,16 +166,16 @@ public class Controller : MonoBehaviour {
     private void FallDown()
     {
         int direction = moveRight? 1: -1;
-        if ((Head.Angle < 0 && moveRight) || (Head.Angle > 0 && !moveRight)) {
-            RotateShape(Head, Time.deltaTime * 160 * direction);
+        if ((head.Angle < 0 && moveRight) || (head.Angle > 0 && !moveRight)) {
+            RotateShape(head, Time.deltaTime * 160 * direction);
         }
-        if ((LowerArm.Angle < 15 && moveRight) || (LowerArm.Angle > -15 && !moveRight)) {
-            RotateShape(LowerArm, Time.deltaTime * 80 * direction);
+        if ((lowerArm.Angle < 15 && moveRight) || (lowerArm.Angle > -15 && !moveRight)) {
+            RotateShape(lowerArm, Time.deltaTime * 80 * direction);
         }
 
-        if ((UpperArm.Angle > -110 && moveRight) || (UpperArm.Angle < 110 && !moveRight))
+        if ((upperArm.Angle > -110 && moveRight) || (upperArm.Angle < 110 && !moveRight))
         {
-            RotateShape(UpperArm, Time.deltaTime * -200 * direction);
+            RotateShape(upperArm, Time.deltaTime * -200 * direction);
         }
         else
         {
@@ -197,25 +196,25 @@ public class Controller : MonoBehaviour {
 
         int direction = moveRight ? 1 : -1;
 
-        if ((UpperArm.Angle < -60 && moveRight) || (UpperArm.Angle > 60 && !moveRight)) {
-            RotateShape(UpperArm, Time.deltaTime * 40 * direction);
-            RotateShape(LowerArm, Time.deltaTime * 30 * direction);
-            RotateShape(Head, Time.deltaTime * 30 * direction);
+        if ((upperArm.Angle < -60 && moveRight) || (upperArm.Angle > 60 && !moveRight)) {
+            RotateShape(upperArm, Time.deltaTime * 40 * direction);
+            RotateShape(lowerArm, Time.deltaTime * 30 * direction);
+            RotateShape(head, Time.deltaTime * 30 * direction);
         }
-        else if ((UpperArm.Angle < 0 && moveRight) || (UpperArm.Angle > 0 && !moveRight))
+        else if ((upperArm.Angle < 0 && moveRight) || (upperArm.Angle > 0 && !moveRight))
         {
-            RotateShape(UpperArm, Time.deltaTime * 100 * direction);
-            if ((LowerArm.Angle > 0 && moveRight) || (LowerArm.Angle < 0 && !moveRight))
-                RotateShape(LowerArm, Time.deltaTime * -100 * direction);
-            if ((Head.Angle > 0 && moveRight) || (Head.Angle < 0 && !moveRight))
-                RotateShape(Head, Time.deltaTime * -50 * direction);
+            RotateShape(upperArm, Time.deltaTime * 100 * direction);
+            if ((lowerArm.Angle > 0 && moveRight) || (lowerArm.Angle < 0 && !moveRight))
+                RotateShape(lowerArm, Time.deltaTime * -100 * direction);
+            if ((head.Angle > 0 && moveRight) || (head.Angle < 0 && !moveRight))
+                RotateShape(head, Time.deltaTime * -50 * direction);
         }
         else
         {
             gettingUp = false;
-            RotateShape(UpperArm, -UpperArm.Angle);
-            RotateShape(LowerArm, -LowerArm.Angle);
-            RotateShape(Head, -Head.Angle);
+            RotateShape(upperArm, -upperArm.Angle);
+            RotateShape(lowerArm, -lowerArm.Angle);
+            RotateShape(head, -head.Angle);
         }
     }
 
@@ -256,21 +255,22 @@ public class Controller : MonoBehaviour {
     {
         float distance = onGround? walkingSpeed * Time.deltaTime : jumpingSpeed * Time.deltaTime;
         Vector2 direction = moveRight ? Vector2.right * distance : Vector2.left * distance;
-        Vector2 pos = new Vector2(moveRight ? Body.Vertices[2].x : Body.Vertices[0].x,
-            (Body.Vertices[0].y + Body.Vertices[1].y) / 2);
+        Vector2 pos = new Vector2(moveRight ? body.Vertices[2].x : body.Vertices[0].x,
+            (body.Vertices[0].y + body.Vertices[1].y) / 2);
         var hit = Physics2D.Raycast(pos, direction, distance, 1);
         if (hit) {
             if (onGround)
             {
-                //Move Head Angle here
+                //Move head Angle here
                 moveRight = !moveRight;
             }
             else
                 return;
         }
         Matrix3x3 T = IGB283Transform.Translate(direction);
-        Body.ApplyTransformation(T);
+        body.ApplyTransformation(T);
     }
+
 
     private void JumpStraightUp()
     {
@@ -281,19 +281,19 @@ public class Controller : MonoBehaviour {
             jumpingUp = true;
             animating = true;
         }
-        // Do animation here
-        // Do animation here
-        if (UpperArm.Angle < 15 && movingForward) {
-            RotateShape(UpperArm, Time.deltaTime * 50);
-            RotateShape(LowerArm, Time.deltaTime * 40);
-            RotateShape(Head, Time.deltaTime * 30);
-        } else if (UpperArm.Angle >= 15 && movingForward) {
-            movingForward = false;
-        } else if (UpperArm.Angle > 0 && !movingForward) {
-            Debug.Log(UpperArm.Angle);
-            RotateShape(UpperArm, Time.deltaTime * -50);
-            RotateShape(LowerArm, Time.deltaTime * -40);
-            RotateShape(Head, Time.deltaTime * -30);
+        int direction = moveRight ? 1 : -1;
+
+        if (((upperArm.Angle < 15 && moveRight) || (upperArm.Angle > -15 && !moveRight)) && movingForward) {
+            RotateShape(upperArm, Time.deltaTime * 50 * direction);
+            RotateShape(lowerArm, Time.deltaTime * 40 * direction);
+            RotateShape(head, Time.deltaTime * 30 * direction); 
+        } else if (((upperArm.Angle >= 15 && moveRight) || (upperArm.Angle <= -15 && !moveRight)) && movingForward) {
+            movingForward = false; 
+        } else if (((upperArm.Angle > 0 && moveRight) || (upperArm.Angle < 0 && !moveRight)) && !movingForward) {
+            Debug.Log(upperArm.Angle);
+            RotateShape(upperArm, Time.deltaTime * -50 * direction);
+            RotateShape(lowerArm, Time.deltaTime * -40 * direction);
+            RotateShape(head, Time.deltaTime * -30 * direction);
         }
         else {
             animating = false;
@@ -308,18 +308,18 @@ public class Controller : MonoBehaviour {
             jumpingForward = true;
             animating = true;
         }
-        // Do animation here
-        if (UpperArm.Angle < 30 && movingForward) {
-            RotateShape(UpperArm, Time.deltaTime * 60);
-            RotateShape(LowerArm, Time.deltaTime * 50);
-            RotateShape(Head, Time.deltaTime * 40);
-        } else if (UpperArm.Angle >= 30 && movingForward) {
+        int direction = moveRight ? 1 : -1;
+        if (((upperArm.Angle < 30 && moveRight) || (upperArm.Angle > -30 && !moveRight)) && movingForward) {
+            RotateShape(upperArm, Time.deltaTime * 60 * direction);
+            RotateShape(lowerArm, Time.deltaTime * 50 * direction);
+            RotateShape(head, Time.deltaTime * 40 * direction);
+        } else if (((upperArm.Angle >= 30 && moveRight) || (upperArm.Angle <= -30 && !moveRight)) && movingForward) {
             movingForward = false;
-        } else if (UpperArm.Angle > 0 && !movingForward) {
-            Debug.Log(UpperArm.Angle);
-            RotateShape(UpperArm, Time.deltaTime * -60);
-            RotateShape(LowerArm, Time.deltaTime * -50);
-            RotateShape(Head, Time.deltaTime * -40);
+        } else if (((upperArm.Angle > 0 && moveRight) || (upperArm.Angle < 0 && !moveRight)) && !movingForward) {
+            Debug.Log(upperArm.Angle);
+            RotateShape(upperArm, Time.deltaTime * -60 * direction);
+            RotateShape(lowerArm, Time.deltaTime * -50 * direction);
+            RotateShape(head, Time.deltaTime * -40 * direction);
         }
         else {
             animating = false;
@@ -329,17 +329,17 @@ public class Controller : MonoBehaviour {
     private void Nodding() {
         int direction = moveRight ? 1 : -1;
         if (!moveUp) {
-            RotateShape(Head, Time.deltaTime * -140 * direction);
-            RotateShape(LowerArm, Time.deltaTime * -28 * direction);
-            RotateShape(UpperArm, Time.deltaTime * 14 * direction);
-            if ((60 < Head.Angle && !moveRight) || (-60 > Head.Angle && moveRight)) {
+            RotateShape(head, Time.deltaTime * -140 * direction);
+            RotateShape(lowerArm, Time.deltaTime * -28 * direction);
+            RotateShape(upperArm, Time.deltaTime * 14 * direction);
+            if ((60 < head.Angle && !moveRight) || (-60 > head.Angle && moveRight)) {
                 moveUp = true;
             }
         } else {
-            RotateShape(Head, Time.deltaTime * 120 * direction);
-            RotateShape(LowerArm, Time.deltaTime * 24 * direction);
-            RotateShape(UpperArm, Time.deltaTime * -12 * direction);
-            if ((15 > Head.Angle && !moveRight) || (-15 < Head.Angle && moveRight)) {
+            RotateShape(head, Time.deltaTime * 120 * direction);
+            RotateShape(lowerArm, Time.deltaTime * 24 * direction);
+            RotateShape(upperArm, Time.deltaTime * -12 * direction);
+            if ((15 > head.Angle && !moveRight) || (-15 < head.Angle && moveRight)) {
                 moveUp = false;
             }
 
