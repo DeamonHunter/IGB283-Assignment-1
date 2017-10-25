@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using IGB283;
 using UnityEngine;
 
@@ -21,10 +19,19 @@ public abstract class Shape {
     public Vector3 RotateCenter;
 
     /// <summary>
-    /// The maximum distance this shape can be interacted with.
+    /// A gameobject that should contain any colliders that would be providing collision for this shape.
     /// </summary>
-    public float InteractionRadius;
+    public GameObject ShapeCollider;
 
+    /// <summary>
+    /// Controls whether translation applies to this shape's collider gameobject. Unity's Heirachy already handles this for children.
+    /// </summary>
+    public bool Parent;
+
+    /// <summary>
+    /// The current angle of the object. Used for tracking animations.
+    /// </summary>
+    public float Angle;
 
     /// <summary>
     /// List of all shapes that are Children to this shape
@@ -32,28 +39,6 @@ public abstract class Shape {
     private List<Shape> children;
     #endregion
 
-    #region Movement Properties
-
-    /// <summary>
-    /// The speed the shape moves. Used for translating between two points.
-    /// </summary>
-    public float Speed;
-
-    /// <summary>
-    /// The speed the shape rotates in each axis. Only Z is used when 2D.
-    /// </summary>
-    public Vector3 RotationSpeed;
-
-    /// <summary>
-    /// Determines which direction the shape will move (left and right).
-    /// </summary>
-    public bool MoveLeft;
-
-
-    public float Angle;
-    /// </summary>
-    public bool MoveUp;
-    #endregion
 
     /// <summary>
     /// Get all triangles in order to render shape correctly.
@@ -62,8 +47,6 @@ public abstract class Shape {
     /// <returns>An array of points that will render the shape correctly.</returns>
     public abstract int[] GetTriangles(int offset);
 
-    public GameObject collider;
-    public bool Parent;
 
     public Shape() {
         children = new List<Shape>();
@@ -77,6 +60,7 @@ public abstract class Shape {
     /// Apply the matrix transformation to all points in this shape. Ignores 3rd dimension.
     /// </summary>
     /// <param name="m">A 3x3 transformation matrix.</param>
+    /// <param name="angle">The angle being applied in the transformation matrix</param>
     public void ApplyTransformation(Matrix3x3 m, float angle = 0) {
         for (int i = 0; i < Vertices.Length; i++) {
             Vector3 vert = Vertices[i];
@@ -96,22 +80,10 @@ public abstract class Shape {
         RotateCenter.z = z2; //Reset Z
 
         Angle += angle;
-        if (collider != null) {
+        if (ShapeCollider != null) {
             if (Parent)
-                collider.transform.position = m * collider.transform.position;
-            collider.transform.localRotation = Quaternion.Euler(0, 0, Angle);
-        }
-    }
-
-    /// <summary>
-    /// Apply the matrix transformation to all points in this shape.
-    /// </summary>
-    /// <param name="m">A 4x4 transformation matrix.</param>
-    public void ApplyTransformation(IGB283.Matrix4x4 m) {
-        //TODO Update
-        for (int i = 0; i < Vertices.Length; i++) {
-            Vector3 vert = Vertices[i];
-            Vertices[i] = m.MultiplyVector3(vert);
+                ShapeCollider.transform.position = m * ShapeCollider.transform.position;
+            ShapeCollider.transform.localRotation = Quaternion.Euler(0, 0, Angle);
         }
     }
 }
