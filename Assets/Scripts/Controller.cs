@@ -93,7 +93,7 @@ public class Controller : MonoBehaviour {
     {
         if (!gettingUp && !fallingDown)
         {
-            if (Input.GetKeyDown(KeyCode.G))
+            if (Input.GetKeyDown(KeyCode.Z))
                 fallingDown = true;
         }
         bool onGround = ApplyVerticalMomentum();
@@ -261,7 +261,6 @@ public class Controller : MonoBehaviour {
         if (hit) {
             if (onGround)
             {
-                //Move head Angle here
                 moveRight = !moveRight;
             }
             else
@@ -290,7 +289,6 @@ public class Controller : MonoBehaviour {
         } else if (((upperArm.Angle >= 15 && moveRight) || (upperArm.Angle <= -15 && !moveRight)) && movingForward) {
             movingForward = false; 
         } else if (((upperArm.Angle > 0 && moveRight) || (upperArm.Angle < 0 && !moveRight)) && !movingForward) {
-            Debug.Log(upperArm.Angle);
             RotateShape(upperArm, Time.deltaTime * -50 * direction);
             RotateShape(lowerArm, Time.deltaTime * -40 * direction);
             RotateShape(head, Time.deltaTime * -30 * direction);
@@ -316,7 +314,6 @@ public class Controller : MonoBehaviour {
         } else if (((upperArm.Angle >= 30 && moveRight) || (upperArm.Angle <= -30 && !moveRight)) && movingForward) {
             movingForward = false;
         } else if (((upperArm.Angle > 0 && moveRight) || (upperArm.Angle < 0 && !moveRight)) && !movingForward) {
-            Debug.Log(upperArm.Angle);
             RotateShape(upperArm, Time.deltaTime * -60 * direction);
             RotateShape(lowerArm, Time.deltaTime * -50 * direction);
             RotateShape(head, Time.deltaTime * -40 * direction);
